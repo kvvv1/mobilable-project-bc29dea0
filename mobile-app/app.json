@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "my-simple-expo",
-    "slug": "my-simple-expo",
+    "name": "DriverFlow - Gestão para Motoristas",
+    "slug": "driverflow",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,17 +10,27 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#8B5CF6"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Precisamos acessar sua câmera para capturar informações de corridas.",
+        "NSPhotoLibraryUsageDescription": "Precisamos acessar suas fotos para processar screenshots de corridas."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#8B5CF6"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.driverflow.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
