@@ -25,16 +25,16 @@ const darkTheme = {
   mode: 'dark',
   colors: {
     primary: '#A78BFA',
-    background: '#111827',
-    surface: '#1F2937',
-    text: '#F9FAFB',
-    textSecondary: '#9CA3AF',
-    border: '#374151',
+    background: '#0F172A', // Mais claro que preto puro, melhor visibilidade
+    surface: '#1E293B', // Mais claro para melhor contraste
+    text: '#F1F5F9', // Texto mais claro e legível
+    textSecondary: '#CBD5E1', // Texto secundário mais visível
+    border: '#475569', // Bordas mais visíveis
     error: '#F87171',
     success: '#34D399',
     warning: '#FBBF24',
-    card: '#1F2937',
-    input: '#374151',
+    card: '#1E293B', // Cards com mais contraste
+    input: '#334155', // Inputs mais claros e visíveis
   },
 };
 

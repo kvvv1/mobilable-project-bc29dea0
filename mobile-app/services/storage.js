@@ -91,12 +91,28 @@ export const StorageService = {
   async getConfig() {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.CONFIG);
-      return data ? JSON.parse(data) : {
+      const defaultConfig = {
+        // Parâmetros principais
+        rsPorKmMinimo: 1.80,
+        rsPorHoraMinimo: 25.00,
+        distanciaMaxima: 10,
+        tempoMaximoEstimado: 30,
+        mediaKmPorLitro: 12,
+        precoCombustivel: 6.00,
+        perfilTrabalho: 'misto',
+        // Parâmetros avançados
+        distanciaMaximaCliente: 1.5,
+        preferenciasApps: {
+          uber: { preferido: false, evitar: false },
+          '99': { preferido: false, evitar: false },
+          ifood: { preferido: false, evitar: false },
+        },
+        metaDiariaLucro: null,
+        // Compatibilidade com versão antiga
         custoKm: 0.5,
         custoHora: 20,
-        mediaKmPorLitro: 12,
-        precoCombustivel: 5.5,
       };
+      return data ? { ...defaultConfig, ...JSON.parse(data) } : defaultConfig;
     } catch (error) {
       console.error('Erro ao buscar configurações:', error);
       return {};

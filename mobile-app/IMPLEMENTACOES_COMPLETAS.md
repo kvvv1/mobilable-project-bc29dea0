@@ -196,3 +196,4 @@ As funcionalidades estão 100% funcionais! Você pode:
 
 **Todas as 5 funcionalidades foram implementadas com sucesso! 🎉**
 
+

@@ -8,49 +8,156 @@ export const AnaliseService = {
       distancia = 0,
       tempoEstimado = 0,
       plataforma = 'uber',
+      distanciaAteCliente = 0,
     } = corrida;
 
+    // Parâmetros principais (novos)
     const {
+      rsPorKmMinimo = 1.80,
+      rsPorHoraMinimo = 25.00,
+      distanciaMaxima = 10,
+      tempoMaximoEstimado = 30,
+      mediaKmPorLitro = 12,
+      precoCombustivel = 6.00,
+      perfilTrabalho = 'misto',
+      // Parâmetros avançados
+      distanciaMaximaCliente = 1.5,
+      preferenciasApps = {},
+      // Compatibilidade com versão antiga
       custoKm = 0.5,
       custoHora = 20,
-      mediaKmPorLitro = 12,
-      precoCombustivel = 5.5,
     } = config;
+
+    // Verificações de limites básicos
+    const excedeDistanciaMaxima = distancia > distanciaMaxima;
+    const excedeTempoMaximo = tempoEstimado > tempoMaximoEstimado;
+    const excedeDistanciaCliente = distanciaAteCliente > distanciaMaximaCliente;
 
     // Calcular custos
     const custoCombustivel = (distancia / mediaKmPorLitro) * precoCombustivel;
-    const custoDesgaste = distancia * custoKm;
-    const custoTempo = (tempoEstimado / 60) * custoHora;
+    const custoDesgaste = distancia * (custoKm || 0.5); // Usa custoKm se disponível
+    const custoTempo = (tempoEstimado / 60) * (custoHora || 20); // Usa custoHora se disponível
     const custoTotal = custoCombustivel + custoDesgaste + custoTempo;
 
     // Lucro líquido
     const lucroLiquido = valor - custoTotal;
     const margemLucro = valor > 0 ? (lucroLiquido / valor) * 100 : 0;
 
-    // Análise de viabilidade
+    // Indicadores principais
+    const valorPorKm = distancia > 0 ? valor / distancia : 0;
+    const valorPorHora = tempoEstimado > 0 ? (valor / tempoEstimado) * 60 : 0;
+
+    // Verificar se atende aos mínimos
+    const atendeRsPorKm = valorPorKm >= rsPorKmMinimo;
+    const atendeRsPorHora = valorPorHora >= rsPorHoraMinimo;
+
+    // Score baseado em múltiplos fatores
+    let score = 0;
+    let motivos = [];
+
+    // Fator 1: Margem de lucro (0-40 pontos)
+    if (margemLucro > 50) {
+      score += 40;
+      motivos.push('Margem de lucro excelente');
+    } else if (margemLucro > 30) {
+      score += 30;
+      motivos.push('Boa margem de lucro');
+    } else if (margemLucro > 15) {
+      score += 20;
+      motivos.push('Margem de lucro razoável');
+    } else if (margemLucro > 0) {
+      score += 10;
+      motivos.push('Margem de lucro baixa');
+    } else {
+      score -= 20;
+      motivos.push('Prejuízo garantido');
+    }
+
+    // Fator 2: R$/km mínimo (0-20 pontos)
+    if (atendeRsPorKm) {
+      score += 20;
+      motivos.push(`R$ ${valorPorKm.toFixed(2)}/km (mínimo: R$ ${rsPorKmMinimo.toFixed(2)})`);
+    } else {
+      score -= 15;
+      motivos.push(`R$ ${valorPorKm.toFixed(2)}/km abaixo do mínimo (R$ ${rsPorKmMinimo.toFixed(2)})`);
+    }
+
+    // Fator 3: R$/hora mínimo (0-20 pontos)
+    if (atendeRsPorHora) {
+      score += 20;
+      motivos.push(`R$ ${valorPorHora.toFixed(2)}/h (mínimo: R$ ${rsPorHoraMinimo.toFixed(2)})`);
+    } else {
+      score -= 15;
+      motivos.push(`R$ ${valorPorHora.toFixed(2)}/h abaixo do mínimo (R$ ${rsPorHoraMinimo.toFixed(2)})`);
+    }
+
+    // Fator 4: Limites de distância e tempo (0-10 pontos)
+    if (excedeDistanciaMaxima) {
+      score -= 10;
+      motivos.push(`Distância (${distancia.toFixed(1)} km) excede máximo (${distanciaMaxima} km)`);
+    } else {
+      score += 5;
+    }
+
+    if (excedeTempoMaximo) {
+      score -= 10;
+      motivos.push(`Tempo (${tempoEstimado} min) excede máximo (${tempoMaximoEstimado} min)`);
+    } else {
+      score += 5;
+    }
+
+    if (excedeDistanciaCliente) {
+      score -= 5;
+      motivos.push(`Distância até cliente (${distanciaAteCliente.toFixed(1)} km) excede máximo (${distanciaMaximaCliente} km)`);
+    }
+
+    // Fator 5: Perfil de trabalho (0-10 pontos)
+    if (perfilTrabalho === 'giro-rapido' && distancia <= 5) {
+      score += 10;
+      motivos.push('Ideal para giro rápido');
+    } else if (perfilTrabalho === 'corridas-longas' && distancia > 8) {
+      score += 10;
+      motivos.push('Ideal para corridas longas');
+    } else if (perfilTrabalho === 'misto') {
+      score += 5;
+    } else {
+      score -= 5;
+      motivos.push('Não alinhado com perfil de trabalho');
+    }
+
+    // Fator 6: Preferências de apps (0-10 pontos)
+    const appPref = preferenciasApps[plataforma] || {};
+    if (appPref.preferido) {
+      score += 10;
+      motivos.push(`App preferido: ${plataforma}`);
+    } else if (appPref.evitar) {
+      score -= 10;
+      motivos.push(`App a evitar: ${plataforma}`);
+    }
+
+    // Normalizar score (0-100)
+    score = Math.max(0, Math.min(100, score));
+
+    // Determinar viabilidade baseado no score
     let viabilidade = 'ruim';
     let recomendacao = 'Não compensa';
 
-    if (margemLucro > 50) {
+    if (score >= 80) {
       viabilidade = 'excelente';
       recomendacao = 'Corrida muito lucrativa! Aceite!';
-    } else if (margemLucro > 30) {
+    } else if (score >= 60) {
       viabilidade = 'boa';
       recomendacao = 'Corrida compensa! Boa margem.';
-    } else if (margemLucro > 15) {
+    } else if (score >= 40) {
       viabilidade = 'razoavel';
       recomendacao = 'Pode aceitar, mas não é ideal.';
-    } else if (margemLucro > 0) {
+    } else if (score >= 20) {
       viabilidade = 'ruim';
       recomendacao = 'Lucro baixo, considere rejeitar.';
     } else {
       viabilidade = 'pessima';
       recomendacao = 'Não compensa! Prejuízo garantido.';
     }
-
-    // Indicadores adicionais
-    const valorPorKm = distancia > 0 ? valor / distancia : 0;
-    const valorPorHora = tempoEstimado > 0 ? (valor / tempoEstimado) * 60 : 0;
 
     return {
       custoCombustivel: parseFloat(custoCombustivel.toFixed(2)),
@@ -63,6 +170,13 @@ export const AnaliseService = {
       valorPorHora: parseFloat(valorPorHora.toFixed(2)),
       viabilidade,
       recomendacao,
+      score: parseFloat(score.toFixed(1)),
+      motivos,
+      atendeRsPorKm,
+      atendeRsPorHora,
+      excedeDistanciaMaxima,
+      excedeTempoMaximo,
+      excedeDistanciaCliente,
     };
   },
 

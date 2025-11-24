@@ -527,3 +527,4 @@ Se precisar de ajuda, consulte:
 - Documentação do Expo: https://docs.expo.dev
 - Suporte do Google Play: https://support.google.com/googleplay
 
+

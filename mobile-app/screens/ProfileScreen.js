@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +16,7 @@ import Button from '../components/Button';
 import { StorageService } from '../services/storage';
 import AnaliseService from '../services/analiseCorridas';
 import { Formatters } from '../utils/formatters';
+
 
 export default function ProfileScreen({ navigation }) {
   const insets = useSafeAreaInsets();
@@ -26,12 +28,27 @@ export default function ProfileScreen({ navigation }) {
     melhorDia: null,
   });
   const [loading, setLoading] = useState(true);
+  const [veiculo, setVeiculo] = useState({
+    id: null,
+    tipo: 'auto',
+    marca: '',
+    modelo: '',
+    ano: '',
+    consumo: '',
+    personalizado: false,
+  });
+  const [showOpcoesVeiculo, setShowOpcoesVeiculo] = useState(false);
+  const [perfilTrabalho, setPerfilTrabalho] = useState('misto');
 
   useEffect(() => {
     loadData();
-    
+    loadVeiculo();
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       loadData();
+      loadVeiculo();
     });
 
     return unsubscribe;
@@ -62,18 +79,54 @@ export default function ProfileScreen({ navigation }) {
         melhorDia,
       });
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
+      // Erro silenciado - dados opcionais
     } finally {
       setLoading(false);
     }
   };
 
+  const loadVeiculo = async () => {
+    try {
+      const configData = await StorageService.getConfig();
+      const veiculoData = configData.veiculo || {};
+      
+      if (veiculoData.modelo) {
+        setVeiculo({
+          id: veiculoData.id || null,
+          tipo: veiculoData.tipo || 'auto',
+          marca: veiculoData.marca || '',
+          modelo: veiculoData.modelo || '',
+          ano: veiculoData.ano || '',
+          consumo: veiculoData.consumo?.toString() || '',
+          personalizado: veiculoData.personalizado || false,
+        });
+      }
+      
+      // Carregar perfil de trabalho
+      setPerfilTrabalho(configData.perfilTrabalho || 'misto');
+    } catch (error) {
+      // Erro silenciado - veículo opcional
+    }
+  };
+
+  const salvarPerfilTrabalho = async (novoPerfil) => {
+    try {
+      const configData = await StorageService.getConfig();
+      await StorageService.saveConfig({
+        ...configData,
+        perfilTrabalho: novoPerfil,
+      });
+      setPerfilTrabalho(novoPerfil);
+      Alert.alert('Sucesso', 'Perfil de trabalho atualizado!');
+    } catch (error) {
+      // Erro já tratado no Alert
+      Alert.alert('Erro', 'Não foi possível salvar o perfil de trabalho.');
+    }
+  };
+
+
   const exportarDados = () => {
-    Alert.alert(
-      'Exportar Dados',
-      'Funcionalidade em desenvolvimento. Em breve você poderá exportar seus dados em PDF ou CSV.',
-      [{ text: 'OK' }]
-    );
+    navigation.navigate('EnviarDados');
   };
 
   const compartilharApp = () => {
@@ -219,6 +272,90 @@ export default function ProfileScreen({ navigation }) {
         </TouchableOpacity>
       </Card>
 
+      {/* Meu Veículo */}
+      <Card>
+        <Text style={styles.sectionTitle}>🚗 Meu Veículo</Text>
+        
+        {veiculo.modelo ? (
+          <View style={styles.veiculoCard}>
+            <View style={styles.veiculoInfo}>
+              <Text style={styles.veiculoIcon}>{veiculo.tipo === 'moto' ? '🏍️' : '🚗'}</Text>
+              <View style={styles.veiculoDetails}>
+                <Text style={styles.veiculoNome}>
+                  {veiculo.marca} {veiculo.modelo}
+                </Text>
+                {veiculo.ano && (
+                  <Text style={styles.veiculoAno}>Ano: {veiculo.ano}</Text>
+                )}
+                <Text style={styles.veiculoConsumo}>
+                  Consumo: {veiculo.consumo} km/L
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.veiculoEditar}
+              onPress={() => setShowOpcoesVeiculo(true)}
+            >
+              <Ionicons name="create-outline" size={20} color="#8B5CF6" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.veiculoAdicionar}
+            onPress={() => setShowOpcoesVeiculo(true)}
+          >
+            <Ionicons name="add-circle-outline" size={24} color="#8B5CF6" />
+            <Text style={styles.veiculoAdicionarText}>Adicionar Veículo</Text>
+          </TouchableOpacity>
+        )}
+      </Card>
+
+      {/* Perfil de Trabalho */}
+      <Card>
+        <Text style={styles.sectionTitle}>⚡ Perfil de Trabalho</Text>
+        <Text style={styles.sectionDescription}>
+          Escolha como você prefere trabalhar
+        </Text>
+        
+        <View style={styles.perfilTrabalhoContainer}>
+          {[
+            { id: 'giro-rapido', label: 'Giro Rápido', icon: '⚡', desc: 'Corridas curtas e rápidas' },
+            { id: 'corridas-longas', label: 'Corridas Longas', icon: '🛣️', desc: 'Valor alto por corrida' },
+            { id: 'misto', label: 'Misto', icon: '🔄', desc: 'Equilibrado' },
+          ].map((perfil) => {
+            const isSelected = perfilTrabalho === perfil.id;
+            return (
+              <TouchableOpacity
+                key={perfil.id}
+                style={[
+                  styles.perfilTrabalhoButton,
+                  isSelected && styles.perfilTrabalhoButtonActive,
+                ]}
+                onPress={() => salvarPerfilTrabalho(perfil.id)}
+              >
+                <Text style={styles.perfilTrabalhoIcon}>{perfil.icon}</Text>
+                <Text
+                  style={[
+                    styles.perfilTrabalhoLabel,
+                    isSelected && styles.perfilTrabalhoLabelActive,
+                  ]}
+                >
+                  {perfil.label}
+                </Text>
+                <Text
+                  style={[
+                    styles.perfilTrabalhoDesc,
+                    isSelected && styles.perfilTrabalhoDescActive,
+                  ]}
+                >
+                  {perfil.desc}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </Card>
+
       {/* Configurações */}
       <Card>
         <Text style={styles.sectionTitle}>⚙️ Configurações</Text>
@@ -277,6 +414,72 @@ export default function ProfileScreen({ navigation }) {
       </Card>
 
       <View style={styles.footer} />
+
+      {/* Modal de Opções de Veículo */}
+      <Modal
+        visible={showOpcoesVeiculo}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowOpcoesVeiculo(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalOpcoesContent}>
+            <View style={styles.modalOpcoesHeader}>
+              <Text style={styles.modalOpcoesTitle}>Adicionar Veículo</Text>
+              <TouchableOpacity
+                onPress={() => setShowOpcoesVeiculo(false)}
+                style={styles.modalOpcoesClose}
+              >
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.modalOpcoesSubtitle}>
+              Escolha como deseja adicionar seu veículo
+            </Text>
+
+            <TouchableOpacity
+              style={styles.opcaoButton}
+              onPress={() => {
+                setShowOpcoesVeiculo(false);
+                navigation.navigate('SelecionarVeiculo');
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.opcaoIconContainer}>
+                <Ionicons name="list" size={32} color="#8B5CF6" />
+              </View>
+              <View style={styles.opcaoContent}>
+                <Text style={styles.opcaoTitle}>Selecione por Modelo</Text>
+                <Text style={styles.opcaoDesc}>
+                  Escolha de uma lista de veículos populares
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.opcaoButton}
+              onPress={() => {
+                setShowOpcoesVeiculo(false);
+                navigation.navigate('CadastrarVeiculo');
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.opcaoIconContainer}>
+                <Ionicons name="create-outline" size={32} color="#10B981" />
+              </View>
+              <View style={styles.opcaoContent}>
+                <Text style={styles.opcaoTitle}>Cadastrar Veículo Personalizado</Text>
+                <Text style={styles.opcaoDesc}>
+                  Preencha manualmente as informações do seu veículo
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -443,5 +646,179 @@ const styles = StyleSheet.create({
   },
   footer: {
     height: 40,
+  },
+  veiculoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F9FAFB',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  veiculoInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  veiculoIcon: {
+    fontSize: 40,
+    marginRight: 12,
+  },
+  veiculoDetails: {
+    flex: 1,
+  },
+  veiculoNome: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  veiculoAno: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginBottom: 2,
+  },
+  veiculoConsumo: {
+    fontSize: 14,
+    color: '#8B5CF6',
+    fontWeight: '600',
+  },
+  veiculoEditar: {
+    padding: 8,
+  },
+  veiculoAdicionar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F9FAFB',
+    padding: 20,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+    gap: 8,
+  },
+  veiculoAdicionarText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#8B5CF6',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalOpcoesContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    width: '85%',
+    maxWidth: 400,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  modalOpcoesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalOpcoesTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  modalOpcoesClose: {
+    padding: 4,
+  },
+  modalOpcoesSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  opcaoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 16,
+    backgroundColor: '#F9FAFB',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  opcaoIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#EDE9FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  opcaoContent: {
+    flex: 1,
+  },
+  opcaoTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  opcaoDesc: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  sectionDescription: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 16,
+  },
+  perfilTrabalhoContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  perfilTrabalhoButton: {
+    flex: 1,
+    minWidth: '30%',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+  },
+  perfilTrabalhoButtonActive: {
+    backgroundColor: '#EDE9FE',
+    borderColor: '#8B5CF6',
+  },
+  perfilTrabalhoIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  perfilTrabalhoLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  perfilTrabalhoLabelActive: {
+    color: '#8B5CF6',
+  },
+  perfilTrabalhoDesc: {
+    fontSize: 11,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  perfilTrabalhoDescActive: {
+    color: '#7C3AED',
   },
 });

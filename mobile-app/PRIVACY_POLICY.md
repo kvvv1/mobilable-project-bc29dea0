@@ -206,3 +206,4 @@ Esta Política de Privacidade está em conformidade com:
 **Data da última atualização:** [DATA]  
 **Próxima revisão:** [DATA + 6 meses]
 
+

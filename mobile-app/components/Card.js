@@ -1,16 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function Card({ children, style, onPress, shadow = true, variant = 'default' }) {
+  const { theme } = useTheme();
   const CardComponent = onPress ? TouchableOpacity : View;
 
   return (
     <CardComponent
       style={[
         styles.card,
+        { backgroundColor: theme.colors.card },
         shadow && styles.shadow,
         variant === 'elevated' && styles.elevated,
-        variant === 'outlined' && styles.outlined,
+        variant === 'outlined' && { borderColor: theme.colors.border },
         style,
       ]}
       onPress={onPress}
@@ -23,7 +26,6 @@ export default function Card({ children, style, onPress, shadow = true, variant 
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     marginVertical: 8,
@@ -50,7 +52,6 @@ const styles = StyleSheet.create({
   },
   outlined: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
     shadowOpacity: 0,
     elevation: 0,
   },

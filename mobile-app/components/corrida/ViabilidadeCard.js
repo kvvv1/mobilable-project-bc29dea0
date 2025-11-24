@@ -49,6 +49,25 @@ export default function ViabilidadeCard({ analise }) {
         </View>
       </View>
 
+      {analise.score !== undefined && (
+        <View style={styles.scoreContainer}>
+          <View style={styles.scoreBar}>
+            <View
+              style={[
+                styles.scoreBarFill,
+                {
+                  width: `${analise.score}%`,
+                  backgroundColor: config.color,
+                },
+              ]}
+            />
+          </View>
+          <Text style={[styles.scoreText, { color: config.color }]}>
+            Score: {analise.score.toFixed(0)}/100
+          </Text>
+        </View>
+      )}
+
       <View style={styles.details}>
         <View style={styles.detailRow}>
           <View style={styles.detailItem}>
@@ -80,6 +99,46 @@ export default function ViabilidadeCard({ analise }) {
 
         <View style={styles.detailRow}>
           <View style={styles.detailItem}>
+            <Ionicons name="speedometer-outline" size={18} color="#6B7280" />
+            <Text style={styles.detailLabel}>Valor/km</Text>
+          </View>
+          <View style={styles.detailValueContainer}>
+            <Text style={styles.detailValue}>
+              {Formatters.currency(analise.valorPorKm)}
+            </Text>
+            {analise.atendeRsPorKm !== undefined && (
+              <Ionicons
+                name={analise.atendeRsPorKm ? 'checkmark-circle' : 'close-circle'}
+                size={16}
+                color={analise.atendeRsPorKm ? '#10B981' : '#EF4444'}
+                style={styles.statusIcon}
+              />
+            )}
+          </View>
+        </View>
+
+        <View style={styles.detailRow}>
+          <View style={styles.detailItem}>
+            <Ionicons name="time-outline" size={18} color="#6B7280" />
+            <Text style={styles.detailLabel}>Valor/hora</Text>
+          </View>
+          <View style={styles.detailValueContainer}>
+            <Text style={styles.detailValue}>
+              {Formatters.currency(analise.valorPorHora)}
+            </Text>
+            {analise.atendeRsPorHora !== undefined && (
+              <Ionicons
+                name={analise.atendeRsPorHora ? 'checkmark-circle' : 'close-circle'}
+                size={16}
+                color={analise.atendeRsPorHora ? '#10B981' : '#EF4444'}
+                style={styles.statusIcon}
+              />
+            )}
+          </View>
+        </View>
+
+        <View style={styles.detailRow}>
+          <View style={styles.detailItem}>
             <Ionicons name="calculator-outline" size={18} color="#6B7280" />
             <Text style={styles.detailLabel}>Custo Total</Text>
           </View>
@@ -88,15 +147,23 @@ export default function ViabilidadeCard({ analise }) {
           </Text>
         </View>
 
-        <View style={styles.detailRow}>
-          <View style={styles.detailItem}>
-            <Ionicons name="speedometer-outline" size={18} color="#6B7280" />
-            <Text style={styles.detailLabel}>Valor/km</Text>
+        {/* Alertas de limites */}
+        {(analise.excedeDistanciaMaxima || analise.excedeTempoMaximo || analise.excedeDistanciaCliente) && (
+          <View style={styles.alertContainer}>
+            <Ionicons name="warning-outline" size={18} color="#F97316" />
+            <View style={styles.alertTextContainer}>
+              {analise.excedeDistanciaMaxima && (
+                <Text style={styles.alertText}>⚠️ Distância excede o máximo configurado</Text>
+              )}
+              {analise.excedeTempoMaximo && (
+                <Text style={styles.alertText}>⚠️ Tempo excede o máximo configurado</Text>
+              )}
+              {analise.excedeDistanciaCliente && (
+                <Text style={styles.alertText}>⚠️ Distância até cliente excede o máximo</Text>
+              )}
+            </View>
           </View>
-          <Text style={styles.detailValue}>
-            {Formatters.currency(analise.valorPorKm)}
-          </Text>
-        </View>
+        )}
       </View>
     </Card>
   );
@@ -149,6 +216,53 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#111827',
+  },
+  detailValueContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  statusIcon: {
+    marginLeft: 4,
+  },
+  scoreContainer: {
+    marginBottom: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  scoreBar: {
+    height: 8,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  scoreBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  scoreText: {
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  alertContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: '#FEF3C7',
+    borderRadius: 8,
+    gap: 8,
+  },
+  alertTextContainer: {
+    flex: 1,
+  },
+  alertText: {
+    fontSize: 12,
+    color: '#92400E',
+    marginBottom: 4,
   },
 });
 

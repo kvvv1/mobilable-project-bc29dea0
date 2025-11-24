@@ -270,3 +270,4 @@ Para implementar o overlay como o Gigu, será necessário desenvolver o módulo 
 - [Android Overlay Windows](https://developer.android.com/reference/android/view/WindowManager.LayoutParams#TYPE_APPLICATION_OVERLAY)
 - [GigU Site Oficial](https://www.gigu.app/pt)
 
+
