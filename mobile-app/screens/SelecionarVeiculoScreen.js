@@ -12,6 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Card from '../components/Card';
 import { StorageService } from '../services/storage';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../services/authService';
 
 // Veículos populares no Brasil com consumo médio real
 const VEICULOS_POPULARES = [
@@ -45,6 +47,7 @@ const VEICULOS_POPULARES = [
 
 export default function SelecionarVeiculoScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
   const [buscaVeiculo, setBuscaVeiculo] = useState('');
 
   // Filtrar veículos por busca
@@ -62,28 +65,75 @@ export default function SelecionarVeiculoScreen({ navigation }) {
 
   // Selecionar veículo da lista
   const selecionarVeiculo = async (veiculoSelecionado) => {
-    const novoVeiculo = {
-      id: veiculoSelecionado.id,
-      tipo: veiculoSelecionado.tipo,
-      marca: veiculoSelecionado.marca,
-      modelo: veiculoSelecionado.modelo,
-      ano: veiculoSelecionado.ano,
-      consumo: veiculoSelecionado.consumo.toString(),
-      personalizado: false,
-    };
-    
-    // Atualizar configurações
-    const configData = await StorageService.getConfig();
-    await StorageService.saveConfig({
-      ...configData,
-      veiculo: novoVeiculo,
-      mediaKmPorLitro: veiculoSelecionado.consumo,
-      tipoVeiculo: veiculoSelecionado.tipo,
-    });
-    
-    Alert.alert('Sucesso', 'Veículo selecionado com sucesso!', [
-      { text: 'OK', onPress: () => navigation.goBack() }
-    ]);
+    try {
+      // Buscar organization_id do perfil do usuário
+      let organizationId = null;
+      if (user?.id) {
+        const { data: profile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('current_organization_id')
+          .eq('id', user.id)
+          .single();
+
+        if (!profileError && profile?.current_organization_id) {
+          organizationId = profile.current_organization_id;
+        }
+      }
+
+      // Salvar no Supabase se tiver organization_id
+      let vehicleId = null;
+      if (organizationId && user?.id) {
+        // Extrair ano do formato "2020-2024" ou usar null
+        const ano = veiculoSelecionado.ano?.split('-')[0] || null;
+        
+        const { data: vehicle, error: vehicleError } = await supabase
+          .from('vehicles')
+          .insert({
+            organization_id: organizationId,
+            user_id: user.id,
+            tipo: veiculoSelecionado.tipo,
+            marca: veiculoSelecionado.marca,
+            modelo: veiculoSelecionado.modelo,
+            ano: ano,
+            consumo_medio: veiculoSelecionado.consumo,
+            personalizado: false,
+          })
+          .select()
+          .single();
+
+        if (!vehicleError && vehicle) {
+          vehicleId = vehicle.id;
+        } else {
+          console.warn('Erro ao salvar veículo no Supabase:', vehicleError);
+        }
+      }
+
+      const novoVeiculo = {
+        id: vehicleId || veiculoSelecionado.id,
+        tipo: veiculoSelecionado.tipo,
+        marca: veiculoSelecionado.marca,
+        modelo: veiculoSelecionado.modelo,
+        ano: veiculoSelecionado.ano,
+        consumo: veiculoSelecionado.consumo.toString(),
+        personalizado: false,
+      };
+      
+      // Atualizar configurações localmente também
+      const configData = await StorageService.getConfig();
+      await StorageService.saveConfig({
+        ...configData,
+        veiculo: novoVeiculo,
+        mediaKmPorLitro: veiculoSelecionado.consumo,
+        tipoVeiculo: veiculoSelecionado.tipo,
+      });
+      
+      Alert.alert('Sucesso', 'Veículo selecionado com sucesso!', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
+    } catch (error) {
+      console.error('Erro ao salvar veículo:', error);
+      Alert.alert('Erro', 'Não foi possível salvar o veículo. Tente novamente.');
+    }
   };
 
   return (

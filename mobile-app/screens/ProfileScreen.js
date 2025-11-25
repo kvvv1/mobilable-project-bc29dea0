@@ -132,10 +132,50 @@ export default function ProfileScreen({ navigation }) {
 
   const loadVeiculo = async () => {
     try {
-      const configData = await StorageService.getConfig();
-      const veiculoData = configData.veiculo || {};
+      // Primeiro tentar carregar do Supabase
+      let veiculoData = null;
       
-      if (veiculoData.modelo) {
+      if (user?.id) {
+        // Buscar organization_id
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('current_organization_id')
+          .eq('id', user.id)
+          .single();
+
+        if (profile?.current_organization_id) {
+          // Buscar veículo ativo do usuário
+          const { data: vehicles, error: vehiclesError } = await supabase
+            .from('vehicles')
+            .select('*')
+            .eq('organization_id', profile.current_organization_id)
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (!vehiclesError && vehicles) {
+            veiculoData = {
+              id: vehicles.id,
+              tipo: vehicles.tipo,
+              marca: vehicles.marca,
+              modelo: vehicles.modelo,
+              ano: vehicles.ano || '',
+              consumo: vehicles.consumo_medio?.toString() || '',
+              personalizado: vehicles.personalizado || false,
+            };
+          }
+        }
+      }
+
+      // Se não encontrou no Supabase, carregar do local
+      if (!veiculoData) {
+        const configData = await StorageService.getConfig();
+        veiculoData = configData.veiculo || {};
+      }
+      
+      if (veiculoData?.modelo) {
         setVeiculo({
           id: veiculoData.id || null,
           tipo: veiculoData.tipo || 'auto',
@@ -148,9 +188,31 @@ export default function ProfileScreen({ navigation }) {
       }
       
       // Carregar perfil de trabalho
+      const configData = await StorageService.getConfig();
       setPerfilTrabalho(configData.perfilTrabalho || 'misto');
     } catch (error) {
-      // Erro silenciado - veículo opcional
+      // Em caso de erro, tentar carregar do local
+      try {
+        const configData = await StorageService.getConfig();
+        const veiculoData = configData.veiculo || {};
+        
+        if (veiculoData.modelo) {
+          setVeiculo({
+            id: veiculoData.id || null,
+            tipo: veiculoData.tipo || 'auto',
+            marca: veiculoData.marca || '',
+            modelo: veiculoData.modelo || '',
+            ano: veiculoData.ano || '',
+            consumo: veiculoData.consumo?.toString() || '',
+            personalizado: veiculoData.personalizado || false,
+          });
+        }
+        
+        setPerfilTrabalho(configData.perfilTrabalho || 'misto');
+      } catch (localError) {
+        // Erro silenciado - veículo opcional
+        console.warn('Erro ao carregar veículo:', localError);
+      }
     }
   };
 

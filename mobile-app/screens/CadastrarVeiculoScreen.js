@@ -14,9 +14,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../components/Button';
 import { StorageService } from '../services/storage';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../services/authService';
 
 export default function CadastrarVeiculoScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
   const [veiculo, setVeiculo] = useState({
     tipo: 'moto',
     marca: '',
@@ -24,6 +27,7 @@ export default function CadastrarVeiculoScreen({ navigation }) {
     ano: '',
     consumo: '',
   });
+  const [loading, setLoading] = useState(false);
 
   // Salvar veículo personalizado
   const salvarVeiculoPersonalizado = async () => {
@@ -31,29 +35,77 @@ export default function CadastrarVeiculoScreen({ navigation }) {
       Alert.alert('Atenção', 'Preencha marca, modelo e consumo do veículo.');
       return;
     }
+
+    setLoading(true);
     
-    const novoVeiculo = {
-      id: `personalizado-${Date.now()}`,
-      tipo: veiculo.tipo,
-      marca: veiculo.marca,
-      modelo: veiculo.modelo,
-      ano: veiculo.ano,
-      consumo: veiculo.consumo,
-      personalizado: true,
-    };
+    try {
+      // Buscar organization_id do perfil do usuário
+      let organizationId = null;
+      if (user?.id) {
+        const { data: profile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('current_organization_id')
+          .eq('id', user.id)
+          .single();
+
+        if (!profileError && profile?.current_organization_id) {
+          organizationId = profile.current_organization_id;
+        }
+      }
+
+      // Salvar no Supabase se tiver organization_id
+      let vehicleId = null;
+      if (organizationId && user?.id) {
+        const { data: vehicle, error: vehicleError } = await supabase
+          .from('vehicles')
+          .insert({
+            organization_id: organizationId,
+            user_id: user.id,
+            tipo: veiculo.tipo,
+            marca: veiculo.marca,
+            modelo: veiculo.modelo,
+            ano: veiculo.ano || null,
+            consumo_medio: parseFloat(veiculo.consumo.replace(',', '.')),
+            personalizado: true,
+          })
+          .select()
+          .single();
+
+        if (!vehicleError && vehicle) {
+          vehicleId = vehicle.id;
+        } else {
+          console.warn('Erro ao salvar veículo no Supabase:', vehicleError);
+        }
+      }
     
-    // Atualizar configurações
-    const configData = await StorageService.getConfig();
-    await StorageService.saveConfig({
-      ...configData,
-      veiculo: novoVeiculo,
-      mediaKmPorLitro: parseFloat(veiculo.consumo.replace(',', '.')),
-      tipoVeiculo: veiculo.tipo,
-    });
-    
-    Alert.alert('Sucesso', 'Veículo personalizado salvo!', [
-      { text: 'OK', onPress: () => navigation.goBack() }
-    ]);
+      const novoVeiculo = {
+        id: vehicleId || `personalizado-${Date.now()}`,
+        tipo: veiculo.tipo,
+        marca: veiculo.marca,
+        modelo: veiculo.modelo,
+        ano: veiculo.ano,
+        consumo: veiculo.consumo,
+        personalizado: true,
+      };
+      
+      // Atualizar configurações localmente também
+      const configData = await StorageService.getConfig();
+      await StorageService.saveConfig({
+        ...configData,
+        veiculo: novoVeiculo,
+        mediaKmPorLitro: parseFloat(veiculo.consumo.replace(',', '.')),
+        tipoVeiculo: veiculo.tipo,
+      });
+      
+      Alert.alert('Sucesso', 'Veículo personalizado salvo!', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
+    } catch (error) {
+      console.error('Erro ao salvar veículo:', error);
+      Alert.alert('Erro', 'Não foi possível salvar o veículo. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -165,6 +217,8 @@ export default function CadastrarVeiculoScreen({ navigation }) {
             title="Salvar Veículo"
             onPress={salvarVeiculoPersonalizado}
             style={styles.saveButton}
+            loading={loading}
+            disabled={loading}
           />
         </View>
       </ScrollView>
