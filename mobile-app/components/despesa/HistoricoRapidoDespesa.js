@@ -43,7 +43,10 @@ export default function HistoricoRapidoDespesa({ tipo, onSelectDespesa }) {
 
   return (
     <Card>
-      <Text style={styles.title}>⚡ Preencher com Última Despesa</Text>
+      <View style={styles.titleContainer}>
+        <Ionicons name="flash-outline" size={18} color="#111827" />
+        <Text style={styles.title}>Preencher com Última Despesa</Text>
+      </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
         {despesas.map((despesa) => {
           const tipoInfo = TIPOS_ICONS[despesa.tipo] || TIPOS_ICONS.outros;
@@ -52,6 +55,9 @@ export default function HistoricoRapidoDespesa({ tipo, onSelectDespesa }) {
               key={despesa.id}
               style={styles.despesaCard}
               onPress={() => onSelectDespesa(despesa)}
+              accessibilityRole="button"
+              accessibilityLabel={`Preencher com despesa de ${Formatters.currency(despesa.valor)}`}
+              accessibilityHint="Toque duas vezes para preencher o formulário com os dados desta despesa"
             >
               <View style={[styles.iconContainer, { backgroundColor: `${tipoInfo.color}20` }]}>
                 <Ionicons name={tipoInfo.icon} size={20} color={tipoInfo.color} />
@@ -64,17 +70,25 @@ export default function HistoricoRapidoDespesa({ tipo, onSelectDespesa }) {
           );
         })}
       </ScrollView>
-      <Text style={styles.hint}>💡 Toque para preencher automaticamente</Text>
+      <View style={styles.hintContainer}>
+        <Ionicons name="information-circle-outline" size={14} color="#6B7280" />
+        <Text style={styles.hint}>Toque para preencher automaticamente</Text>
+      </View>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
   title: {
     fontSize: 16,
     fontWeight: '600',
     color: '#111827',
-    marginBottom: 12,
   },
   scrollView: {
     marginHorizontal: -4,
@@ -106,11 +120,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
   },
+  hintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
   hint: {
     fontSize: 11,
     color: '#6B7280',
-    marginTop: 8,
     fontStyle: 'italic',
+    flex: 1,
   },
 });
 

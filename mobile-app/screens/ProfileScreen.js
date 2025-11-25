@@ -18,6 +18,7 @@ import AnaliseService from '../services/analiseCorridas';
 import { Formatters } from '../utils/formatters';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/authService';
+import PerfilTrabalhoSelector from '../components/PerfilTrabalhoSelector';
 
 
 export default function ProfileScreen({ navigation }) {
@@ -293,7 +294,10 @@ export default function ProfileScreen({ navigation }) {
 
       {/* Informações Detalhadas */}
       <Card>
-        <Text style={styles.sectionTitle}>📊 Estatísticas Detalhadas</Text>
+        <View style={styles.sectionTitleContainer}>
+          <Ionicons name="analytics-outline" size={20} color="#111827" />
+          <Text style={styles.sectionTitle}>Estatísticas Detalhadas</Text>
+        </View>
         
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
@@ -334,7 +338,10 @@ export default function ProfileScreen({ navigation }) {
 
       {/* Ações Rápidas */}
       <Card>
-        <Text style={styles.sectionTitle}>⚡ Ações Rápidas</Text>
+        <View style={styles.sectionTitleContainer}>
+          <Ionicons name="flash-outline" size={20} color="#111827" />
+          <Text style={styles.sectionTitle}>Ações Rápidas</Text>
+        </View>
         
         <TouchableOpacity 
           style={styles.actionItem}
@@ -355,7 +362,7 @@ export default function ProfileScreen({ navigation }) {
           onPress={() => navigation.navigate('Metas')}
         >
           <View style={styles.actionIconContainer}>
-            <Ionicons name="flag" size={24} color="#10B981" />
+            <Ionicons name="flag" size={24} color="#8B5CF6" />
           </View>
           <View style={styles.actionContent}>
             <Text style={styles.actionTitle}>Metas e Objetivos</Text>
@@ -369,7 +376,7 @@ export default function ProfileScreen({ navigation }) {
           onPress={exportarDados}
         >
           <View style={styles.actionIconContainer}>
-            <Ionicons name="download-outline" size={24} color="#3B82F6" />
+            <Ionicons name="download-outline" size={24} color="#8B5CF6" />
           </View>
           <View style={styles.actionContent}>
             <Text style={styles.actionTitle}>Exportar Dados</Text>
@@ -381,12 +388,21 @@ export default function ProfileScreen({ navigation }) {
 
       {/* Meu Veículo */}
       <Card>
-        <Text style={styles.sectionTitle}>🚗 Meu Veículo</Text>
+        <View style={styles.sectionTitleContainer}>
+          <Ionicons name="car-outline" size={20} color="#111827" />
+          <Text style={styles.sectionTitle}>Meu Veículo</Text>
+        </View>
         
         {veiculo.modelo ? (
           <View style={styles.veiculoCard}>
             <View style={styles.veiculoInfo}>
-              <Text style={styles.veiculoIcon}>{veiculo.tipo === 'moto' ? '🏍️' : '🚗'}</Text>
+              <View style={styles.veiculoIconContainer}>
+                <Ionicons
+                  name={veiculo.tipo === 'moto' ? 'bicycle-outline' : 'car-outline'}
+                  size={40}
+                  color="#111827"
+                />
+              </View>
               <View style={styles.veiculoDetails}>
                 <Text style={styles.veiculoNome}>
                   {veiculo.marca} {veiculo.modelo}
@@ -418,54 +434,14 @@ export default function ProfileScreen({ navigation }) {
       </Card>
 
       {/* Perfil de Trabalho */}
-      <Card>
-        <Text style={styles.sectionTitle}>⚡ Perfil de Trabalho</Text>
-        <Text style={styles.sectionDescription}>
-          Escolha como você prefere trabalhar
-        </Text>
-        
-        <View style={styles.perfilTrabalhoContainer}>
-          {[
-            { id: 'giro-rapido', label: 'Giro Rápido', icon: '⚡', desc: 'Corridas curtas e rápidas' },
-            { id: 'corridas-longas', label: 'Corridas Longas', icon: '🛣️', desc: 'Valor alto por corrida' },
-            { id: 'misto', label: 'Misto', icon: '🔄', desc: 'Equilibrado' },
-          ].map((perfil) => {
-            const isSelected = perfilTrabalho === perfil.id;
-            return (
-              <TouchableOpacity
-                key={perfil.id}
-                style={[
-                  styles.perfilTrabalhoButton,
-                  isSelected && styles.perfilTrabalhoButtonActive,
-                ]}
-                onPress={() => salvarPerfilTrabalho(perfil.id)}
-              >
-                <Text style={styles.perfilTrabalhoIcon}>{perfil.icon}</Text>
-                <Text
-                  style={[
-                    styles.perfilTrabalhoLabel,
-                    isSelected && styles.perfilTrabalhoLabelActive,
-                  ]}
-                >
-                  {perfil.label}
-                </Text>
-                <Text
-                  style={[
-                    styles.perfilTrabalhoDesc,
-                    isSelected && styles.perfilTrabalhoDescActive,
-                  ]}
-                >
-                  {perfil.desc}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </Card>
+      <PerfilTrabalhoSelector selected={perfilTrabalho} onSelect={salvarPerfilTrabalho} />
 
       {/* Configurações */}
       <Card>
-        <Text style={styles.sectionTitle}>⚙️ Configurações</Text>
+        <View style={styles.sectionTitleContainer}>
+          <Ionicons name="settings-outline" size={20} color="#111827" />
+          <Text style={styles.sectionTitle}>Configurações</Text>
+        </View>
         
         <TouchableOpacity 
           style={styles.actionItem}
@@ -674,11 +650,16 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     textAlign: 'center',
   },
+  sectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#111827',
-    marginBottom: 16,
   },
   infoRow: {
     marginBottom: 16,
@@ -769,9 +750,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  veiculoIcon: {
-    fontSize: 40,
+  veiculoIconContainer: {
     marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   veiculoDetails: {
     flex: 1,
@@ -886,46 +868,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     marginBottom: 16,
-  },
-  perfilTrabalhoContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  perfilTrabalhoButton: {
-    flex: 1,
-    minWidth: '30%',
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-  },
-  perfilTrabalhoButtonActive: {
-    backgroundColor: '#EDE9FE',
-    borderColor: '#8B5CF6',
-  },
-  perfilTrabalhoIcon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  perfilTrabalhoLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  perfilTrabalhoLabelActive: {
-    color: '#8B5CF6',
-  },
-  perfilTrabalhoDesc: {
-    fontSize: 11,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  perfilTrabalhoDescActive: {
-    color: '#7C3AED',
   },
 });

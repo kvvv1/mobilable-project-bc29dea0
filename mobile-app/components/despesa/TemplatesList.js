@@ -55,8 +55,16 @@ export default function TemplatesList({ onSelectTemplate, onSaveAsTemplate }) {
   return (
     <Card>
       <View style={styles.header}>
-        <Text style={styles.title}>📋 Templates Rápidos</Text>
-        <TouchableOpacity onPress={onSaveAsTemplate}>
+        <View style={styles.titleContainer}>
+          <Ionicons name="document-text-outline" size={20} color="#111827" />
+          <Text style={styles.title}>Templates Rápidos</Text>
+        </View>
+        <TouchableOpacity
+          onPress={onSaveAsTemplate}
+          accessibilityRole="button"
+          accessibilityLabel="Adicionar novo template"
+          accessibilityHint="Toque duas vezes para salvar os dados atuais como template"
+        >
           <Ionicons name="add-circle-outline" size={24} color="#8B5CF6" />
         </TouchableOpacity>
       </View>
@@ -67,6 +75,9 @@ export default function TemplatesList({ onSelectTemplate, onSaveAsTemplate }) {
             style={styles.templateItem}
             onPress={() => handleSelect(template)}
             onLongPress={() => handleDelete(template)}
+            accessibilityRole="button"
+            accessibilityLabel={`Template ${template.nome}, valor ${Formatters.currency(template.valor)}`}
+            accessibilityHint="Toque para usar este template. Pressione e segure para excluir"
           >
             <View style={styles.templateContent}>
               <Text style={styles.templateNome}>{template.nome}</Text>
@@ -78,9 +89,12 @@ export default function TemplatesList({ onSelectTemplate, onSaveAsTemplate }) {
           </TouchableOpacity>
         ))}
       </View>
-      <Text style={styles.hint}>
-        💡 Toque para usar • Pressione e segure para excluir
-      </Text>
+      <View style={styles.hintContainer}>
+        <Ionicons name="information-circle-outline" size={14} color="#6B7280" />
+        <Text style={styles.hint}>
+          Toque para usar • Pressione e segure para excluir
+        </Text>
+      </View>
     </Card>
   );
 }
@@ -91,6 +105,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   title: {
     fontSize: 16,
@@ -123,11 +142,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
   },
+  hintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
   hint: {
     fontSize: 11,
     color: '#6B7280',
-    marginTop: 8,
     fontStyle: 'italic',
+    flex: 1,
   },
 });
 

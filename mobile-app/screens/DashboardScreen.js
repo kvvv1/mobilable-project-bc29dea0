@@ -371,7 +371,10 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Card de Insights */}
       <Card>
-        <Text style={styles.sectionTitle}>📊 Insights</Text>
+        <View style={styles.sectionTitleContainer}>
+          <Ionicons name="analytics-outline" size={20} color="#111827" />
+          <Text style={styles.sectionTitle}>Insights</Text>
+        </View>
         <View style={styles.insightItem}>
           <Ionicons name="time-outline" size={20} color="#8B5CF6" />
           <View style={styles.insightContent}>
@@ -413,13 +416,13 @@ export default function DashboardScreen({ navigation }) {
       {/* Botões de Ação */}
       <View style={styles.actionsContainer}>
         <Button
-          title="📸 Capturar Corrida"
+          title="Capturar Corrida"
           onPress={() => navigation.getParent()?.navigate('Entrada')}
           icon={<Ionicons name="camera-outline" size={20} color="#FFFFFF" />}
           style={styles.actionButton}
         />
         <Button
-          title="💰 Adicionar Despesa"
+          title="Adicionar Despesa"
           onPress={() => navigation.getParent()?.navigate('Saidas')}
           variant="outline"
           icon={<Ionicons name="add-circle-outline" size={20} color="#8B5CF6" />}
@@ -587,11 +590,16 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 10,
   },
+  sectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#111827',
-    marginBottom: 16,
   },
   insightItem: {
     flexDirection: 'row',

@@ -10,24 +10,19 @@ import {
   Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Card from '../Card';
+import Card from './Card';
 
-const TIPOS_DESPESA = [
-  { id: 'combustivel', label: 'Combustível', icon: 'car-outline', color: '#F59E0B' },
-  { id: 'manutencao', label: 'Manutenção', icon: 'build-outline', color: '#6366F1' },
-  { id: 'alimentacao', label: 'Alimentação', icon: 'restaurant-outline', color: '#EC4899' },
-  { id: 'estacionamento', label: 'Estacionamento', icon: 'location-outline', color: '#10B981' },
-  { id: 'lavagem', label: 'Lavagem', icon: 'water-outline', color: '#06B6D4' },
-  { id: 'multa', label: 'Multa', icon: 'document-text-outline', color: '#EF4444' },
-  { id: 'seguro', label: 'Seguro', icon: 'shield-checkmark-outline', color: '#8B5CF6' },
-  { id: 'outros', label: 'Outros', icon: 'ellipsis-horizontal-outline', color: '#6B7280' },
+const PERFIS_TRABALHO = [
+  { id: 'giro-rapido', label: 'Giro Rápido', icon: 'flash-outline', color: '#8B5CF6', desc: 'Corridas curtas e rápidas' },
+  { id: 'corridas-longas', label: 'Corridas Longas', icon: 'trending-up-outline', color: '#10B981', desc: 'Valor alto por corrida' },
+  { id: 'misto', label: 'Misto', icon: 'sync-outline', color: '#3B82F6', desc: 'Equilibrado' },
 ];
 
-export default function TipoDespesaSelector({ selected, onSelect }) {
+export default function PerfilTrabalhoSelector({ selected, onSelect }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
 
-  const selectedTipo = TIPOS_DESPESA.find((t) => t.id === selected) || TIPOS_DESPESA[0];
+  const selectedPerfil = PERFIS_TRABALHO.find((p) => p.id === selected) || PERFIS_TRABALHO[0];
 
   const openModal = () => {
     setModalVisible(true);
@@ -48,35 +43,38 @@ export default function TipoDespesaSelector({ selected, onSelect }) {
     });
   };
 
-  const handleSelect = (tipoId) => {
-    onSelect(tipoId);
+  const handleSelect = (perfilId) => {
+    onSelect(perfilId);
     closeModal();
   };
 
   return (
     <Card>
-      <Text style={styles.sectionTitle}>Tipo de Despesa *</Text>
+      <View style={styles.sectionTitleContainer}>
+        <Ionicons name="briefcase-outline" size={20} color="#111827" />
+        <Text style={styles.sectionTitle}>Perfil de Trabalho</Text>
+      </View>
       
       <TouchableOpacity
         style={[
           styles.dropdownButton,
-          { borderColor: selectedTipo.color, backgroundColor: `${selectedTipo.color}10` },
+          { borderColor: selectedPerfil.color, backgroundColor: `${selectedPerfil.color}10` },
         ]}
         onPress={openModal}
         activeOpacity={0.7}
         accessibilityRole="button"
-        accessibilityLabel={`Selecionar tipo de despesa. Tipo atual: ${selectedTipo.label}`}
-        accessibilityHint="Toque duas vezes para abrir o menu de tipos de despesa"
+        accessibilityLabel={`Selecionar perfil de trabalho. Perfil atual: ${selectedPerfil.label}`}
+        accessibilityHint="Toque duas vezes para abrir o menu de perfis de trabalho"
       >
         <View style={styles.dropdownContent}>
-          <View style={[styles.iconContainer, { backgroundColor: selectedTipo.color }]}>
-            <Ionicons name={selectedTipo.icon} size={24} color="#FFFFFF" />
+          <View style={[styles.iconContainer, { backgroundColor: selectedPerfil.color }]}>
+            <Ionicons name={selectedPerfil.icon} size={24} color="#FFFFFF" />
           </View>
           <View style={styles.dropdownTextContainer}>
-            <Text style={styles.dropdownLabel}>{selectedTipo.label}</Text>
-            <Text style={styles.dropdownHint}>Toque para alterar</Text>
+            <Text style={styles.dropdownLabel}>{selectedPerfil.label}</Text>
+            <Text style={styles.dropdownHint}>{selectedPerfil.desc}</Text>
           </View>
-          <Ionicons name="chevron-down" size={20} color={selectedTipo.color} />
+          <Ionicons name="chevron-down" size={20} color={selectedPerfil.color} />
         </View>
       </TouchableOpacity>
 
@@ -105,7 +103,7 @@ export default function TipoDespesaSelector({ selected, onSelect }) {
           >
             <Pressable onPress={(e) => e.stopPropagation()}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Selecione o Tipo de Despesa</Text>
+                <Text style={styles.modalTitle}>Selecione o Perfil de Trabalho</Text>
                 <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                   <Ionicons name="close" size={24} color="#6B7280" />
                 </TouchableOpacity>
@@ -116,43 +114,44 @@ export default function TipoDespesaSelector({ selected, onSelect }) {
                 showsVerticalScrollIndicator={false}
                 bounces={false}
               >
-                {TIPOS_DESPESA.map((tipo, index) => {
-                  const isSelected = selected === tipo.id;
+                {PERFIS_TRABALHO.map((perfil, index) => {
+                  const isSelected = selected === perfil.id;
                   return (
                     <TouchableOpacity
-                      key={tipo.id}
+                      key={perfil.id}
                       style={[
                         styles.optionItem,
-                        isSelected && { backgroundColor: `${tipo.color}15` },
-                        index === TIPOS_DESPESA.length - 1 && styles.lastOption,
+                        isSelected && { backgroundColor: `${perfil.color}15` },
+                        index === PERFIS_TRABALHO.length - 1 && styles.lastOption,
                       ]}
-                      onPress={() => handleSelect(tipo.id)}
+                      onPress={() => handleSelect(perfil.id)}
                       activeOpacity={0.7}
                       accessibilityRole="button"
-                      accessibilityLabel={`${tipo.label}${isSelected ? ' - Selecionado' : ''}`}
-                      accessibilityHint={isSelected ? 'Tipo de despesa já selecionado' : 'Toque duas vezes para selecionar este tipo'}
+                      accessibilityLabel={`${perfil.label} - ${perfil.desc}${isSelected ? ' - Selecionado' : ''}`}
+                      accessibilityHint={isSelected ? 'Perfil de trabalho já selecionado' : 'Toque duas vezes para selecionar este perfil'}
                       accessibilityState={{ selected: isSelected }}
                     >
                       <View style={styles.optionContent}>
                         <View
                           style={[
                             styles.optionIconContainer,
-                            { backgroundColor: isSelected ? tipo.color : `${tipo.color}20` },
+                            { backgroundColor: isSelected ? perfil.color : `${perfil.color}20` },
                           ]}
                         >
                           <Ionicons
-                            name={tipo.icon}
+                            name={perfil.icon}
                             size={22}
-                            color={isSelected ? '#FFFFFF' : tipo.color}
+                            color={isSelected ? '#FFFFFF' : perfil.color}
                           />
                         </View>
                         <View style={styles.optionTextContainer}>
-                          <Text style={[styles.optionLabel, isSelected && { color: tipo.color, fontWeight: '600' }]}>
-                            {tipo.label}
+                          <Text style={[styles.optionLabel, isSelected && { color: perfil.color, fontWeight: '600' }]}>
+                            {perfil.label}
                           </Text>
+                          <Text style={styles.optionDesc}>{perfil.desc}</Text>
                         </View>
                         {isSelected && (
-                          <View style={[styles.checkContainer, { backgroundColor: tipo.color }]}>
+                          <View style={[styles.checkContainer, { backgroundColor: perfil.color }]}>
                             <Ionicons name="checkmark" size={16} color="#FFFFFF" />
                           </View>
                         )}
@@ -170,11 +169,16 @@ export default function TipoDespesaSelector({ selected, onSelect }) {
 }
 
 const styles = StyleSheet.create({
+  sectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#111827',
-    marginBottom: 12,
   },
   dropdownButton: {
     borderWidth: 2,
@@ -273,6 +277,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#374151',
     fontWeight: '500',
+    marginBottom: 4,
+  },
+  optionDesc: {
+    fontSize: 13,
+    color: '#6B7280',
   },
   checkContainer: {
     width: 24,
@@ -282,3 +291,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+

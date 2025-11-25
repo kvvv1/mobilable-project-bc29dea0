@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -49,6 +49,33 @@ export default function SelecionarVeiculoScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const [buscaVeiculo, setBuscaVeiculo] = useState('');
+  const [veiculoAtual, setVeiculoAtual] = useState(null);
+
+  // Carregar veículo atual ao montar componente
+  useEffect(() => {
+    loadVeiculoAtual();
+  }, []);
+
+  const loadVeiculoAtual = async () => {
+    try {
+      const configData = await StorageService.getConfig();
+      if (configData?.veiculo) {
+        setVeiculoAtual(configData.veiculo);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar veículo atual:', error);
+    }
+  };
+
+  const isVeiculoSelecionado = (v) => {
+    if (!veiculoAtual) return false;
+    // Verificar se é o Fiat Uno selecionado
+    if (v.id === 'fiat-uno') {
+      return veiculoAtual.marca === 'Fiat' && veiculoAtual.modelo === 'Uno';
+    }
+    // Para outros veículos, verificar por marca e modelo
+    return veiculoAtual.marca === v.marca && veiculoAtual.modelo === v.modelo;
+  };
 
   // Filtrar veículos por busca
   const getVeiculosFiltrados = () => {
@@ -127,6 +154,9 @@ export default function SelecionarVeiculoScreen({ navigation }) {
         tipoVeiculo: veiculoSelecionado.tipo,
       });
       
+      // Atualizar veículo atual após seleção
+      setVeiculoAtual(novoVeiculo);
+      
       Alert.alert('Sucesso', 'Veículo selecionado com sucesso!', [
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
@@ -182,9 +212,21 @@ export default function SelecionarVeiculoScreen({ navigation }) {
               onPress={() => selecionarVeiculo(v)}
               activeOpacity={0.7}
             >
-              <Text style={styles.veiculoItemIcon}>
-                {v.tipo === 'moto' ? '🏍️' : '🚗'}
-              </Text>
+              <View style={[
+                styles.veiculoItemIconContainer,
+                v.id === 'fiat-uno' && isVeiculoSelecionado(v) && styles.veiculoItemIconContainerSelected
+              ]}>
+                <Ionicons
+                  name={v.tipo === 'moto' ? 'bicycle-outline' : 'car-outline'}
+                  size={24}
+                  color="#8B5CF6"
+                />
+                {v.id === 'fiat-uno' && isVeiculoSelecionado(v) && (
+                  <View style={styles.iconBadge}>
+                    <Ionicons name="checkmark-circle" size={18} color="#8B5CF6" />
+                  </View>
+                )}
+              </View>
               <View style={styles.veiculoItemInfo}>
                 <Text style={styles.veiculoItemNome}>
                   {v.marca} {v.modelo}
@@ -284,9 +326,29 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
   },
-  veiculoItemIcon: {
-    fontSize: 36,
-    marginRight: 16,
+  veiculoItemIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    position: 'relative',
+  },
+  veiculoItemIconContainerSelected: {
+    backgroundColor: '#EDE9FE',
+    borderWidth: 2,
+    borderColor: '#8B5CF6',
+  },
+  iconBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#8B5CF6',
   },
   veiculoItemInfo: {
     flex: 1,

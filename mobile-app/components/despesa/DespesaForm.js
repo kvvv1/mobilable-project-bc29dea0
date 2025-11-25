@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import Card from '../Card';
 import { Masks } from '../../utils/masks';
 
@@ -61,9 +62,12 @@ export default function DespesaForm({
           numberOfLines={4}
           textAlignVertical="top"
         />
-        <Text style={styles.hint}>
-          💡 Dica: Seja específico para facilitar o controle futuro
-        </Text>
+        <View style={styles.hintContainer}>
+          <Ionicons name="information-circle-outline" size={16} color="#6B7280" />
+          <Text style={styles.hint}>
+            Dica: Seja específico para facilitar o controle futuro
+          </Text>
+        </View>
       </View>
     </Card>
   );
@@ -110,11 +114,17 @@ const styles = StyleSheet.create({
     minHeight: 100,
     paddingTop: 14,
   },
+  hintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
   hint: {
     fontSize: 12,
     color: '#6B7280',
-    marginTop: 6,
     fontStyle: 'italic',
+    flex: 1,
   },
 });
 

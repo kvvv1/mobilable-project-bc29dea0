@@ -125,7 +125,7 @@ export default function CapturarCorridaScreen({ navigation }) {
     >
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={[styles.header, { paddingTop: Math.max(insets.top + 10, 20) }]}>
-          <Text style={styles.title}>📸 Capturar Corrida</Text>
+          <Text style={styles.title}>Capturar Corrida</Text>
           <Text style={styles.subtitle}>
             Tire uma foto da proposta ou preencha manualmente
           </Text>
@@ -168,7 +168,7 @@ export default function CapturarCorridaScreen({ navigation }) {
 
         <View style={styles.footer}>
           <Button
-            title="💾 Salvar Corrida"
+            title="Salvar Corrida"
             onPress={salvarCorrida}
             loading={loading}
             style={styles.saveButton}

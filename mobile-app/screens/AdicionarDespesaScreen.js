@@ -76,7 +76,7 @@ export default function AdicionarDespesaScreen({ navigation }) {
     >
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={[styles.header, { paddingTop: Math.max(insets.top + 10, 20) }]}>
-          <Text style={styles.title}>💰 Adicionar Despesa</Text>
+          <Text style={styles.title}>Adicionar Despesa</Text>
           <Text style={styles.subtitle}>
             Registre todas as suas despesas para manter o controle
           </Text>

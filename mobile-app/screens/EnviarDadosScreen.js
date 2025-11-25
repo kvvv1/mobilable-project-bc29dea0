@@ -116,7 +116,7 @@ export default function EnviarDadosScreen({ navigation }) {
         {/* Configuração Z-API */}
         <Card>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-            ⚙️ Configuração Z-API
+            Configuração Z-API
           </Text>
           <Text style={[styles.sectionDescription, { color: theme.colors.textSecondary }]}>
             Configure suas credenciais do Z-API para enviar dados via WhatsApp
@@ -188,7 +188,7 @@ export default function EnviarDadosScreen({ navigation }) {
           </View>
 
           <Button
-            title="💾 Salvar Configuração"
+            title="Salvar Configuração"
             onPress={saveConfig}
             variant="outline"
             style={styles.saveButton}
@@ -301,7 +301,7 @@ export default function EnviarDadosScreen({ navigation }) {
         {/* Botão de Envio */}
         <View style={styles.footer}>
           <Button
-            title={loading ? 'Enviando...' : '📱 Enviar via WhatsApp'}
+            title={loading ? 'Enviando...' : 'Enviar via WhatsApp'}
             onPress={handleSend}
             disabled={loading}
             loading={loading}

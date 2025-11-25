@@ -5,6 +5,17 @@ import Card from '../Card';
 import { HistoryService } from '../../services/historyService';
 import { Formatters } from '../../utils/formatters';
 
+const getPlataformaIcon = (plataforma) => {
+  switch (plataforma?.toLowerCase()) {
+    case '99':
+      return <Ionicons name="car-sport" size={20} color="#FFC107" />;
+    case 'ifood':
+      return <Ionicons name="restaurant" size={20} color="#EA1D2C" />;
+    default:
+      return <Ionicons name="car" size={20} color="#000000" />;
+  }
+};
+
 export default function HistoricoRapido({ onSelectCorrida }) {
   const [corridas, setCorridas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,20 +41,22 @@ export default function HistoricoRapido({ onSelectCorrida }) {
 
   return (
     <Card>
-      <Text style={styles.title}>⚡ Preencher com Última Corrida</Text>
+      <View style={styles.titleContainer}>
+        <Ionicons name="flash-outline" size={18} color="#111827" />
+        <Text style={styles.title}>Preencher com Última Corrida</Text>
+      </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
         {corridas.map((corrida) => (
           <TouchableOpacity
             key={corrida.id}
             style={styles.corridaCard}
             onPress={() => onSelectCorrida(corrida)}
+            accessibilityRole="button"
+            accessibilityLabel={`Preencher com corrida de ${Formatters.currency(corrida.valor)}, plataforma ${corrida.plataforma?.toUpperCase()}`}
+            accessibilityHint="Toque duas vezes para preencher o formulário com os dados desta corrida"
           >
             <View style={styles.corridaHeader}>
-              <Ionicons
-                name="car"
-                size={20}
-                color={corrida.plataforma === 'uber' ? '#000' : '#00D9FF'}
-              />
+              {getPlataformaIcon(corrida.plataforma)}
               <Text style={styles.plataforma}>{corrida.plataforma?.toUpperCase()}</Text>
             </View>
             <Text style={styles.valor}>{Formatters.currency(corrida.valor)}</Text>
@@ -53,17 +66,25 @@ export default function HistoricoRapido({ onSelectCorrida }) {
           </TouchableOpacity>
         ))}
       </ScrollView>
-      <Text style={styles.hint}>💡 Toque para preencher automaticamente</Text>
+      <View style={styles.hintContainer}>
+        <Ionicons name="information-circle-outline" size={14} color="#6B7280" />
+        <Text style={styles.hint}>Toque para preencher automaticamente</Text>
+      </View>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
   title: {
     fontSize: 16,
     fontWeight: '600',
     color: '#111827',
-    marginBottom: 12,
   },
   scrollView: {
     marginHorizontal: -4,
@@ -98,11 +119,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
   },
+  hintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
   hint: {
     fontSize: 11,
     color: '#6B7280',
-    marginTop: 8,
     fontStyle: 'italic',
+    flex: 1,
   },
 });
 

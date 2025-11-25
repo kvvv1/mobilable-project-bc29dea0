@@ -72,6 +72,8 @@ export default function ImagePickerComponent({ image, onImageSelected, onImageRe
               onPress={onImageRemoved}
               style={styles.removeButton}
               icon={<Ionicons name="trash-outline" size={18} color="#8B5CF6" />}
+              accessibilityLabel="Remover foto selecionada"
+              accessibilityHint="Toque duas vezes para remover a foto atual"
             />
           </View>
         ) : (
@@ -85,18 +87,22 @@ export default function ImagePickerComponent({ image, onImageSelected, onImageRe
             </Text>
             <View style={styles.imageButtons}>
               <Button
-                title="📷 Tirar Foto"
+                title="Tirar Foto"
                 onPress={takePhoto}
                 variant="outline"
                 style={styles.imageButton}
                 icon={<Ionicons name="camera" size={18} color="#8B5CF6" />}
+                accessibilityLabel="Tirar foto da proposta de corrida"
+                accessibilityHint="Toque duas vezes para abrir a câmera e tirar uma foto"
               />
               <Button
-                title="🖼️ Escolher"
+                title="Escolher"
                 onPress={pickImage}
                 variant="outline"
                 style={styles.imageButton}
                 icon={<Ionicons name="images-outline" size={18} color="#8B5CF6" />}
+                accessibilityLabel="Escolher imagem da galeria"
+                accessibilityHint="Toque duas vezes para abrir a galeria e selecionar uma foto"
               />
             </View>
           </View>

@@ -148,9 +148,13 @@ export default function CadastrarVeiculoScreen({ navigation }) {
                   onPress={() => setVeiculo({ ...veiculo, tipo })}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.tipoVeiculoButtonIcon}>
-                    {tipo === 'moto' ? '🏍️' : '🚗'}
-                  </Text>
+                  <View style={styles.tipoVeiculoButtonIconContainer}>
+                    <Ionicons
+                      name={tipo === 'moto' ? 'bicycle-outline' : 'car-outline'}
+                      size={24}
+                      color={veiculo.tipo === tipo ? '#FFFFFF' : '#8B5CF6'}
+                    />
+                  </View>
                   <Text
                     style={[
                       styles.tipoVeiculoButtonLabel,
@@ -306,8 +310,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#8B5CF6',
     borderColor: '#8B5CF6',
   },
-  tipoVeiculoButtonIcon: {
-    fontSize: 40,
+  tipoVeiculoButtonIconContainer: {
     marginBottom: 12,
   },
   tipoVeiculoButtonLabel: {

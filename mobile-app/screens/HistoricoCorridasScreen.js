@@ -178,7 +178,7 @@ export default function HistoricoCorridasScreen({ navigation }) {
   const getPlataformaColor = (plataforma) => {
     switch (plataforma?.toLowerCase()) {
       case 'uber': return '#000000';
-      case '99': return '#00D9FF';
+      case '99': return '#FFC107';
       case 'ifood': return '#EA1D2C';
       default: return '#8B5CF6';
     }

@@ -10,6 +10,8 @@ export default function Button({
   icon,
   style,
   textStyle,
+  accessibilityLabel,
+  accessibilityHint,
 }) {
   return (
     <TouchableOpacity
@@ -22,6 +24,10 @@ export default function Button({
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel || title}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled: disabled || loading }}
     >
       {loading ? (
         <ActivityIndicator color={variant === 'primary' ? '#FFFFFF' : '#8B5CF6'} />

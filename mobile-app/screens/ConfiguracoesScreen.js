@@ -426,7 +426,10 @@ export default function ConfiguracoesScreen({ navigation }) {
     >
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={[styles.header, { paddingTop: Math.max(insets.top + 10, 20) }]}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>⚙️ Configurações</Text>
+          <View style={styles.titleContainer}>
+            <Ionicons name="settings-outline" size={24} color={theme.colors.text} />
+            <Text style={[styles.title, { color: theme.colors.text }]}>Configurações</Text>
+          </View>
           <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
             Configure os parâmetros para análise de corridas
           </Text>
@@ -819,17 +822,17 @@ export default function ConfiguracoesScreen({ navigation }) {
 
         {/* Aparência */}
         <Card>
-          <Text style={styles.sectionTitle}>🌙 Aparência</Text>
+          <Text style={styles.sectionTitle}>Aparência</Text>
           <Text style={styles.sectionDescription}>
             Escolha o tema visual do aplicativo
           </Text>
           <View style={styles.themeContainer}>
             <View style={styles.themeButtons}>
               {[
-                { mode: 'light', label: 'Claro', icon: '☀️', desc: 'Tema claro' },
-                { mode: 'dark', label: 'Escuro', icon: '🌙', desc: 'Tema escuro' },
-                { mode: 'system', label: 'Auto', icon: '🔄', desc: 'Seguir sistema' },
-              ].map(({ mode, label, icon, desc }) => {
+                { mode: 'light', label: 'Claro', iconName: 'sunny-outline', desc: 'Tema claro' },
+                { mode: 'dark', label: 'Escuro', iconName: 'moon-outline', desc: 'Tema escuro' },
+                { mode: 'system', label: 'Auto', iconName: 'phone-portrait-outline', desc: 'Seguir sistema' },
+              ].map(({ mode, label, iconName, desc }) => {
                 const isSelected = themeMode === mode;
                 return (
                   <TouchableOpacity
@@ -844,13 +847,12 @@ export default function ConfiguracoesScreen({ navigation }) {
                     onPress={() => toggleTheme(mode)}
                     activeOpacity={0.7}
                   >
-                    <Text
-                      style={[
-                        styles.themeButtonText,
-                      ]}
-                    >
-                      {icon}
-                    </Text>
+                    <Ionicons
+                      name={iconName}
+                      size={24}
+                      color={isSelected ? '#FFFFFF' : theme.colors.text}
+                      style={styles.themeButtonIcon}
+                    />
                     <Text
                       style={[
                         styles.themeButtonLabel,
@@ -925,11 +927,16 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 20,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 4,
+  },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#111827',
-    marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
@@ -1040,7 +1047,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#8B5CF6',
     borderColor: '#8B5CF6',
   },
-  themeButtonText: {
+  themeButtonIcon: {
     fontSize: 24,
     marginBottom: 4,
   },

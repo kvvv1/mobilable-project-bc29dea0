@@ -5,7 +5,7 @@ import Button from '../Button';
 
 const PLATAFORMAS = [
   { id: 'uber', label: 'UBER', icon: 'car', color: '#000000' },
-  { id: '99', label: '99', icon: 'car-sport', color: '#00D9FF' },
+  { id: '99', label: '99', icon: 'car-sport', color: '#FFC107' },
   { id: 'ifood', label: 'IFOOD', icon: 'restaurant', color: '#EA1D2C' },
 ];
 
