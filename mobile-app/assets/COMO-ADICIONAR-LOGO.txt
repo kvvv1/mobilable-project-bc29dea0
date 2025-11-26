@@ -1,0 +1,53 @@
+═══════════════════════════════════════════════════════════════
+    📍 COMO ADICIONAR SUA LOGO NO APP
+═══════════════════════════════════════════════════════════════
+
+📂 LOCALIZAÇÃO:
+   Coloque TODOS os arquivos na pasta:
+   
+   mobile-app/assets/
+   
+   ⚠️ IMPORTANTE: Mantenha os nomes EXATOS dos arquivos!
+
+═══════════════════════════════════════════════════════════════
+
+📋 ARQUIVOS NECESSÁRIOS:
+
+1. icon.png
+   └─ Tamanho: 1024 x 1024 pixels
+   └─ Formato: PNG
+   └─ Uso: Ícone do app nas lojas
+
+2. splash-icon.png
+   └─ Tamanho: 1024 x 1024 pixels (ou proporcional)
+   └─ Formato: PNG (fundo transparente)
+   └─ Uso: Tela de loading inicial
+
+3. adaptive-icon.png
+   └─ Tamanho: 1024 x 1024 pixels
+   └─ Formato: PNG (fundo transparente)
+   └─ Uso: Ícone Android moderno
+
+4. favicon.png
+   └─ Tamanho: 48 x 48 ou 96 x 96 pixels
+   └─ Formato: PNG
+   └─ Uso: Ícone na versão web
+
+═══════════════════════════════════════════════════════════════
+
+✅ PASSOS:
+
+1. Prepare suas imagens com os tamanhos acima
+2. Coloque os arquivos na pasta: mobile-app/assets/
+3. Mantenha os NOMES EXATOS: icon.png, splash-icon.png, etc.
+4. Substitua os arquivos existentes
+5. Pronto! O app usará sua logo automaticamente
+
+═══════════════════════════════════════════════════════════════
+
+🎨 SUA LOGO:
+   Pin verde com cifrão ($) + estrada verde
+   Perfeita para usar em todos os formatos!
+
+═══════════════════════════════════════════════════════════════
+

@@ -16,10 +16,10 @@ const TIPOS_DESPESA = [
   { id: 'combustivel', label: 'Combustível', icon: 'car-outline', color: '#F59E0B' },
   { id: 'manutencao', label: 'Manutenção', icon: 'build-outline', color: '#6366F1' },
   { id: 'alimentacao', label: 'Alimentação', icon: 'restaurant-outline', color: '#EC4899' },
-  { id: 'estacionamento', label: 'Estacionamento', icon: 'location-outline', color: '#10B981' },
+  { id: 'estacionamento', label: 'Estacionamento', icon: 'location-outline', color: '#6BBD9B' },
   { id: 'lavagem', label: 'Lavagem', icon: 'water-outline', color: '#06B6D4' },
   { id: 'multa', label: 'Multa', icon: 'document-text-outline', color: '#EF4444' },
-  { id: 'seguro', label: 'Seguro', icon: 'shield-checkmark-outline', color: '#8B5CF6' },
+  { id: 'seguro', label: 'Seguro', icon: 'shield-checkmark-outline', color: '#6BBD9B' },
   { id: 'outros', label: 'Outros', icon: 'ellipsis-horizontal-outline', color: '#6B7280' },
 ];
 

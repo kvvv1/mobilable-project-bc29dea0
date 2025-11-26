@@ -30,7 +30,7 @@ export default function Button({
       accessibilityState={{ disabled: disabled || loading }}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? '#FFFFFF' : '#8B5CF6'} />
+        <ActivityIndicator color={variant === 'primary' ? '#FFFFFF' : '#6BBD9B'} />
       ) : (
         <>
           {icon && <View style={styles.icon}>{icon}</View>}
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     minHeight: 50,
   },
   primary: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
   },
   secondary: {
     backgroundColor: '#F3F4F6',
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#8B5CF6',
+    borderColor: '#6BBD9B',
   },
   disabled: {
     opacity: 0.5,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
   outlineText: {
-    color: '#8B5CF6',
+    color: '#6BBD9B',
   },
   icon: {
     marginRight: 8,

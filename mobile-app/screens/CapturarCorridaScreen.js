@@ -8,7 +8,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '../contexts/ThemeContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import ImagePickerComponent from '../components/corrida/ImagePickerComponent';
@@ -22,6 +24,7 @@ import { Masks } from '../utils/masks';
 
 export default function CapturarCorridaScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const [image, setImage] = useState(null);
   const [plataforma, setPlataforma] = useState('uber');
   const [valor, setValor] = useState('');
@@ -125,8 +128,11 @@ export default function CapturarCorridaScreen({ navigation }) {
     >
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={[styles.header, { paddingTop: Math.max(insets.top + 10, 20) }]}>
-          <Text style={styles.title}>Capturar Corrida</Text>
-          <Text style={styles.subtitle}>
+          <View style={styles.titleContainer}>
+            <Ionicons name="camera-outline" size={24} color={theme.colors.text} />
+            <Text style={[styles.title, { color: theme.colors.text }]}>Capturar Corrida</Text>
+          </View>
+          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
             Tire uma foto da proposta ou preencha manualmente
           </Text>
         </View>
@@ -192,11 +198,16 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 20,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 4,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#111827',
-    marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,

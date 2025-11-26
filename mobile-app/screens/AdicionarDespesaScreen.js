@@ -8,7 +8,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '../contexts/ThemeContext';
 import Button from '../components/Button';
 import TipoDespesaSelector from '../components/despesa/TipoDespesaSelector';
 import DespesaForm from '../components/despesa/DespesaForm';
@@ -22,6 +24,7 @@ import { Masks } from '../utils/masks';
 
 export default function AdicionarDespesaScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const [tipo, setTipo] = useState('combustivel');
   const [valor, setValor] = useState('');
   const [descricao, setDescricao] = useState('');
@@ -76,8 +79,11 @@ export default function AdicionarDespesaScreen({ navigation }) {
     >
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={[styles.header, { paddingTop: Math.max(insets.top + 10, 20) }]}>
-          <Text style={styles.title}>Adicionar Despesa</Text>
-          <Text style={styles.subtitle}>
+          <View style={styles.titleContainer}>
+            <Ionicons name="cash-outline" size={24} color={theme.colors.text} />
+            <Text style={[styles.title, { color: theme.colors.text }]}>Adicionar Despesa</Text>
+          </View>
+          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
             Registre todas as suas despesas para manter o controle
           </Text>
         </View>
@@ -166,11 +172,16 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 20,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 4,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#111827',
-    marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,

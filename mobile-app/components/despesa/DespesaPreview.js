@@ -9,10 +9,10 @@ const TIPOS_INFO = {
   combustivel: { label: 'Combustível', icon: 'car-outline', color: '#F59E0B' },
   manutencao: { label: 'Manutenção', icon: 'build-outline', color: '#6366F1' },
   alimentacao: { label: 'Alimentação', icon: 'restaurant-outline', color: '#EC4899' },
-  estacionamento: { label: 'Estacionamento', icon: 'location-outline', color: '#10B981' },
+  estacionamento: { label: 'Estacionamento', icon: 'location-outline', color: '#6BBD9B' },
   lavagem: { label: 'Lavagem', icon: 'water-outline', color: '#06B6D4' },
   multa: { label: 'Multa', icon: 'document-text-outline', color: '#EF4444' },
-  seguro: { label: 'Seguro', icon: 'shield-checkmark-outline', color: '#8B5CF6' },
+  seguro: { label: 'Seguro', icon: 'shield-checkmark-outline', color: '#6BBD9B' },
   outros: { label: 'Outros', icon: 'ellipsis-horizontal-outline', color: '#6B7280' },
 };
 

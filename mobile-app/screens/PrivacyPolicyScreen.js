@@ -52,7 +52,7 @@ export default function PrivacyPolicyScreen({ navigation }) {
       >
         <Card style={styles.card}>
           <View style={styles.iconContainer}>
-            <Ionicons name="shield-checkmark" size={48} color="#10B981" />
+            <Ionicons name="shield-checkmark" size={48} color="#6BBD9B" />
           </View>
           <Text style={styles.title}>Política de Privacidade</Text>
           <Text style={styles.subtitle}>DriverFlow - Gestão para Motoristas</Text>
@@ -74,19 +74,19 @@ export default function PrivacyPolicyScreen({ navigation }) {
             O DriverFlow armazena apenas os dados que você fornece manualmente:
           </Text>
           <View style={styles.listItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={20} color="#6BBD9B" />
             <Text style={styles.listText}>Dados de corridas (valor, distância, tempo)</Text>
           </View>
           <View style={styles.listItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={20} color="#6BBD9B" />
             <Text style={styles.listText}>Despesas e receitas</Text>
           </View>
           <View style={styles.listItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={20} color="#6BBD9B" />
             <Text style={styles.listText}>Imagens capturadas por você</Text>
           </View>
           <View style={styles.listItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={20} color="#6BBD9B" />
             <Text style={styles.listText}>Configurações do aplicativo</Text>
           </View>
         </Card>
@@ -99,7 +99,7 @@ export default function PrivacyPolicyScreen({ navigation }) {
             informações com terceiros.
           </Text>
           <View style={styles.highlightBox}>
-            <Ionicons name="lock-closed" size={24} color="#8B5CF6" />
+            <Ionicons name="lock-closed" size={24} color="#6BBD9B" />
             <Text style={styles.highlightText}>
               Processamento 100% local. Seus dados nunca saem do seu dispositivo.
             </Text>
@@ -140,11 +140,11 @@ export default function PrivacyPolicyScreen({ navigation }) {
             Você tem total controle sobre seus dados:
           </Text>
           <View style={styles.listItem}>
-            <Ionicons name="eye" size={20} color="#8B5CF6" />
+            <Ionicons name="eye" size={20} color="#6BBD9B" />
             <Text style={styles.listText}>Visualizar todos os seus dados</Text>
           </View>
           <View style={styles.listItem}>
-            <Ionicons name="create" size={20} color="#8B5CF6" />
+            <Ionicons name="create" size={20} color="#6BBD9B" />
             <Text style={styles.listText}>Editar ou atualizar informações</Text>
           </View>
           <View style={styles.listItem}>
@@ -182,9 +182,9 @@ export default function PrivacyPolicyScreen({ navigation }) {
             style={styles.linkButton}
             onPress={openPrivacyPolicyURL}
           >
-            <Ionicons name="link" size={20} color="#8B5CF6" />
+            <Ionicons name="link" size={20} color="#6BBD9B" />
             <Text style={styles.linkText}>Ver Política de Privacidade Completa</Text>
-            <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
+            <Ionicons name="chevron-forward" size={20} color="#6BBD9B" />
           </TouchableOpacity>
           <Text style={styles.disclaimer}>
             Nota: Atualize a URL da política no código antes de publicar na Play Store.
@@ -197,7 +197,7 @@ export default function PrivacyPolicyScreen({ navigation }) {
             Se você tiver dúvidas sobre esta política de privacidade, entre em contato:
           </Text>
           <View style={styles.contactItem}>
-            <Ionicons name="mail" size={20} color="#8B5CF6" />
+            <Ionicons name="mail" size={20} color="#6BBD9B" />
             <Text style={styles.contactText}>contato@driverflow.app</Text>
           </View>
           <Text style={styles.disclaimer}>
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   linkText: {
     flex: 1,
     fontSize: 14,
-    color: '#8B5CF6',
+    color: '#6BBD9B',
     fontWeight: '600',
     marginLeft: 12,
   },

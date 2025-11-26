@@ -225,8 +225,8 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   plataformaButtonActive: {
-    backgroundColor: '#8B5CF6',
-    borderColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
+    borderColor: '#6BBD9B',
   },
   plataformaButtonText: {
     fontSize: 14,
@@ -257,8 +257,8 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   viabilidadeButtonActive: {
-    backgroundColor: '#8B5CF6',
-    borderColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
+    borderColor: '#6BBD9B',
   },
   viabilidadeButtonText: {
     fontSize: 14,

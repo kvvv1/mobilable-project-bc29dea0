@@ -155,7 +155,7 @@ export default function HistoricoCorridasScreen({ navigation }) {
 
   const getViabilidadeColor = (viabilidade) => {
     switch (viabilidade) {
-      case 'excelente': return '#10B981';
+      case 'excelente': return '#6BBD9B';
       case 'boa': return '#22C55E';
       case 'razoavel': return '#EAB308';
       case 'ruim': return '#F97316';
@@ -180,7 +180,7 @@ export default function HistoricoCorridasScreen({ navigation }) {
       case 'uber': return '#000000';
       case '99': return '#FFC107';
       case 'ifood': return '#EA1D2C';
-      default: return '#8B5CF6';
+      default: return '#6BBD9B';
     }
   };
 
@@ -203,7 +203,7 @@ export default function HistoricoCorridasScreen({ navigation }) {
         </TouchableOpacity>
         <Text style={styles.title}>Histórico de Corridas</Text>
         <TouchableOpacity onPress={() => setFiltrosModalVisible(true)}>
-          <Ionicons name="filter" size={24} color="#8B5CF6" />
+          <Ionicons name="filter" size={24} color="#6BBD9B" />
         </TouchableOpacity>
       </View>
 
@@ -348,7 +348,7 @@ export default function HistoricoCorridasScreen({ navigation }) {
                     style={styles.actionButton}
                     onPress={() => abrirDetalhes(corrida)}
                   >
-                    <Ionicons name="eye-outline" size={18} color="#8B5CF6" />
+                    <Ionicons name="eye-outline" size={18} color="#6BBD9B" />
                     <Text style={styles.actionButtonText}>Ver Detalhes</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -468,7 +468,7 @@ export default function HistoricoCorridasScreen({ navigation }) {
                         <Text style={styles.modalLabel}>Lucro Líquido:</Text>
                         <Text style={[
                           styles.modalValue,
-                          { color: corridaSelecionada.analise.lucroLiquido > 0 ? '#10B981' : '#EF4444' }
+                          { color: corridaSelecionada.analise.lucroLiquido > 0 ? '#6BBD9B' : '#EF4444' }
                         ]}>
                           {Formatters.currency(corridaSelecionada.analise.lucroLiquido)}
                         </Text>
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filtroButtonActive: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
   },
   filtroButtonText: {
     fontSize: 13,
@@ -652,7 +652,7 @@ const styles = StyleSheet.create({
   corridaValor: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#10B981',
+    color: '#6BBD9B',
   },
   viabilidadeBadge: {
     flexDirection: 'row',
@@ -715,7 +715,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#8B5CF6',
+    color: '#6BBD9B',
   },
   actionButtonTextDanger: {
     color: '#EF4444',

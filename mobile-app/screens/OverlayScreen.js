@@ -128,7 +128,7 @@ export default function OverlayScreen({ navigation }) {
         </View>
         <Card>
           <View style={styles.infoContainer}>
-            <Ionicons name="information-circle-outline" size={48} color="#8B5CF6" />
+            <Ionicons name="information-circle-outline" size={48} color="#6BBD9B" />
             <Text style={styles.infoText}>
               O overlay com acessibilidade só funciona no Android. No iOS, esta
               funcionalidade não é suportada devido às limitações do sistema.
@@ -161,7 +161,7 @@ export default function OverlayScreen({ navigation }) {
             value={overlayEnabled}
             onValueChange={handleToggleOverlay}
             disabled={loading}
-            trackColor={{ false: '#E5E7EB', true: '#8B5CF6' }}
+            trackColor={{ false: '#E5E7EB', true: '#6BBD9B' }}
             thumbColor={overlayEnabled ? '#FFFFFF' : '#F3F4F6'}
           />
         </View>
@@ -176,7 +176,7 @@ export default function OverlayScreen({ navigation }) {
             <Ionicons
               name={hasOverlayPermission ? 'checkmark-circle' : 'close-circle'}
               size={24}
-              color={hasOverlayPermission ? '#10B981' : '#EF4444'}
+              color={hasOverlayPermission ? '#6BBD9B' : '#EF4444'}
             />
             <View style={styles.permissionText}>
               <Text style={styles.permissionLabel}>
@@ -204,7 +204,7 @@ export default function OverlayScreen({ navigation }) {
                 hasAccessibilityPermission ? 'checkmark-circle' : 'close-circle'
               }
               size={24}
-              color={hasAccessibilityPermission ? '#10B981' : '#EF4444'}
+              color={hasAccessibilityPermission ? '#6BBD9B' : '#EF4444'}
             />
             <View style={styles.permissionText}>
               <Text style={styles.permissionLabel}>
@@ -231,31 +231,31 @@ export default function OverlayScreen({ navigation }) {
         <Text style={styles.sectionTitle}>ℹ️ Como Funciona</Text>
         <View style={styles.howItWorksList}>
           <View style={styles.howItWorksItem}>
-            <Ionicons name="eye-outline" size={20} color="#8B5CF6" />
+            <Ionicons name="eye-outline" size={20} color="#6BBD9B" />
             <Text style={styles.howItWorksText}>
               O app monitora a tela automaticamente usando AccessibilityService
             </Text>
           </View>
           <View style={styles.howItWorksItem}>
-            <Ionicons name="phone-portrait-outline" size={20} color="#8B5CF6" />
+            <Ionicons name="phone-portrait-outline" size={20} color="#6BBD9B" />
             <Text style={styles.howItWorksText}>
               Detecta quando apps de corrida (Uber, 99, iFood) mostram uma proposta
             </Text>
           </View>
           <View style={styles.howItWorksItem}>
-            <Ionicons name="document-text-outline" size={20} color="#8B5CF6" />
+            <Ionicons name="document-text-outline" size={20} color="#6BBD9B" />
             <Text style={styles.howItWorksText}>
               Extrai automaticamente valor, distância e tempo estimado
             </Text>
           </View>
           <View style={styles.howItWorksItem}>
-            <Ionicons name="speedometer-outline" size={20} color="#8B5CF6" />
+            <Ionicons name="speedometer-outline" size={20} color="#6BBD9B" />
             <Text style={styles.howItWorksText}>
               Analisa se a corrida compensa baseado nos seus parâmetros
             </Text>
           </View>
           <View style={styles.howItWorksItem}>
-            <Ionicons name="radio-button-on-outline" size={20} color="#8B5CF6" />
+            <Ionicons name="radio-button-on-outline" size={20} color="#6BBD9B" />
             <Text style={styles.howItWorksText}>
               Mostra um semáforo de cores (verde/amarelo/vermelho) no overlay
             </Text>
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   mainCard: {
     marginHorizontal: 20,
     marginBottom: 16,
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
   },
   switchContainer: {
     flexDirection: 'row',

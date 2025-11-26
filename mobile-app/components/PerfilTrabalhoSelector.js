@@ -13,8 +13,8 @@ import { Ionicons } from '@expo/vector-icons';
 import Card from './Card';
 
 const PERFIS_TRABALHO = [
-  { id: 'giro-rapido', label: 'Giro Rápido', icon: 'flash-outline', color: '#8B5CF6', desc: 'Corridas curtas e rápidas' },
-  { id: 'corridas-longas', label: 'Corridas Longas', icon: 'trending-up-outline', color: '#10B981', desc: 'Valor alto por corrida' },
+  { id: 'giro-rapido', label: 'Giro Rápido', icon: 'flash-outline', color: '#6BBD9B', desc: 'Corridas curtas e rápidas' },
+  { id: 'corridas-longas', label: 'Corridas Longas', icon: 'trending-up-outline', color: '#6BBD9B', desc: 'Valor alto por corrida' },
   { id: 'misto', label: 'Misto', icon: 'sync-outline', color: '#3B82F6', desc: 'Equilibrado' },
 ];
 

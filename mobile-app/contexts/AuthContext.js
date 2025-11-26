@@ -158,48 +158,79 @@ export function AuthProvider({ children }) {
         return false;
       }
 
-      // Primeiro verificar AsyncStorage
+      // Primeiro verificar AsyncStorage (cache local)
       const completed = await AsyncStorage.getItem(ONBOARDING_KEY);
       let isCompleted = completed === 'true';
       
       logger.debug('Onboarding no AsyncStorage:', isCompleted, 'User ID:', user.id);
       
-      // Se não está marcado como completo no AsyncStorage, verificar se já tem dados no banco
-      // IMPORTANTE: Não criar perfil aqui - isso será feito no OnboardingScreen
-      if (!isCompleted) {
-        try {
-          logger.debug('Verificando organização do usuário no banco...');
-          
-          // Verificar perfil uma única vez (sem retry, sem criar)
-          const { data: profile, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('current_organization_id')
-            .eq('id', user.id)
-            .single();
-          
-          if (profileError) {
-            if (profileError.code === 'PGRST116') {
-              // Perfil não existe - isso é normal, será criado no OnboardingScreen
-              logger.debug('Perfil não encontrado - será criado no OnboardingScreen');
-              isCompleted = false;
-            } else {
-              logger.warn('Erro ao buscar perfil:', profileError);
-              isCompleted = false;
-            }
-          } else if (profile?.current_organization_id) {
-            // Usuário já tem organização, considerar onboarding completo
-            // (veículos podem ser adicionados depois)
-            isCompleted = true;
-            await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
-            logger.debug('Onboarding detectado como completo (usuário tem organização):', profile.current_organization_id);
+      // SEMPRE verificar no banco de dados para garantir consistência
+      try {
+        logger.debug('Verificando configuração do usuário no banco de dados...');
+        
+        // 1. Verificar se o usuário tem perfil e organização
+        const { data: profile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('current_organization_id')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileError) {
+          if (profileError.code === 'PGRST116') {
+            // Perfil não existe - isso é normal, será criado no OnboardingScreen
+            logger.debug('Perfil não encontrado - será criado no OnboardingScreen');
+            isCompleted = false;
           } else {
-            logger.debug('Usuário não tem organização ainda - onboarding não completo');
+            logger.warn('Erro ao buscar perfil:', profileError);
             isCompleted = false;
           }
-        } catch (error) {
-          logger.warn('Erro ao verificar organização do usuário:', error);
+        } else if (profile?.current_organization_id) {
+          // 2. Verificar se existe configuração salva na organização
+          const { data: settings, error: settingsError } = await supabase
+            .from('organization_settings')
+            .select('id, rs_por_km_minimo, rs_por_hora_minimo, media_km_por_litro, preco_combustivel')
+            .eq('organization_id', profile.current_organization_id)
+            .single();
+          
+          if (settingsError) {
+            if (settingsError.code === 'PGRST116') {
+              // Configuração não existe ainda
+              logger.debug('Configuração não encontrada - onboarding não completo');
+              isCompleted = false;
+            } else {
+              logger.warn('Erro ao buscar configurações:', settingsError);
+              // Em caso de erro, usar o valor do AsyncStorage como fallback
+              isCompleted = completed === 'true';
+            }
+          } else if (settings) {
+            // Verificar se a configuração tem valores válidos (não apenas defaults)
+            // Se tem configuração salva, considerar onboarding completo
+            const hasValidConfig = settings.rs_por_km_minimo && 
+                                  settings.rs_por_hora_minimo && 
+                                  settings.media_km_por_litro && 
+                                  settings.preco_combustivel;
+            
+            if (hasValidConfig) {
+              isCompleted = true;
+              // Atualizar AsyncStorage para cache
+              await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+              logger.debug('Onboarding detectado como completo (configuração encontrada no banco):', profile.current_organization_id);
+            } else {
+              logger.debug('Configuração existe mas está incompleta - onboarding não completo');
+              isCompleted = false;
+            }
+          } else {
+            logger.debug('Usuário tem organização mas não tem configuração - onboarding não completo');
+            isCompleted = false;
+          }
+        } else {
+          logger.debug('Usuário não tem organização ainda - onboarding não completo');
           isCompleted = false;
         }
+      } catch (error) {
+        logger.warn('Erro ao verificar configuração do usuário:', error);
+        // Em caso de erro, usar o valor do AsyncStorage como fallback
+        isCompleted = completed === 'true';
       }
       
       setOnboardingCompleted(isCompleted);

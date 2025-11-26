@@ -16,8 +16,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { StorageService } from '../services/storage';
 import { Formatters } from '../utils/formatters';
+import PerfisPrefeitosSelector from '../components/PerfisPrefeitosSelector';
+import { supabase } from '../services/authService';
 
 const PERFIS_TRABALHO = [
   { id: 'giro-rapido', label: 'Giro Rápido', icon: '⚡', desc: 'Prefere corridas curtas e rápidas' },
@@ -164,6 +167,7 @@ const PERFIS_PREFEITOS = [
 export default function ConfiguracoesScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { theme, themeMode, toggleTheme } = useTheme();
+  const { user } = useAuth();
   
   // Helper para estilos de input com tema
   const getThemedInputStyle = () => ({
@@ -194,6 +198,7 @@ export default function ConfiguracoesScreen({ navigation }) {
     custoHora: '',
   });
   const [showAvancados, setShowAvancados] = useState(false);
+  const [showComoFunciona, setShowComoFunciona] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [veiculoCadastrado, setVeiculoCadastrado] = useState(null);
@@ -300,7 +305,7 @@ export default function ConfiguracoesScreen({ navigation }) {
         precoCombustivel: parseFloat(config.precoCombustivel.replace(',', '.')),
         // perfilTrabalho e tipoVeiculo são gerenciados no Perfil, não aqui
         // Mantém os valores do storage se existirem
-        perfilTrabalho: configData.perfilTrabalho || 'misto',
+        perfilTrabalho: config.perfilTrabalho || 'misto',
         tipoVeiculo: getTipoVeiculoAtual(),
         // Parâmetros avançados
         distanciaMaximaCliente: config.distanciaMaximaCliente ? parseFloat(config.distanciaMaximaCliente.replace(',', '.')) : 1.5,
@@ -311,7 +316,75 @@ export default function ConfiguracoesScreen({ navigation }) {
         custoHora: config.custoHora ? parseFloat(config.custoHora.replace(',', '.')) : 20,
       };
 
+      // Salvar localmente
       await StorageService.saveConfig(configData);
+
+      // Salvar no Supabase se o usuário estiver autenticado
+      if (user?.id) {
+        try {
+          // Buscar organization_id do perfil do usuário
+          const { data: profile, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('current_organization_id')
+            .eq('id', user.id)
+            .single();
+
+          if (!profileError && profile?.current_organization_id) {
+            // Preparar dados para o Supabase (mapear nomes dos campos)
+            const settingsData = {
+              rs_por_km_minimo: configData.rsPorKmMinimo,
+              rs_por_hora_minimo: configData.rsPorHoraMinimo,
+              distancia_maxima: configData.distanciaMaxima,
+              tempo_maximo_estimado: configData.tempoMaximoEstimado,
+              media_km_por_litro: configData.mediaKmPorLitro,
+              preco_combustivel: configData.precoCombustivel,
+              perfil_trabalho: configData.perfilTrabalho,
+              distancia_maxima_cliente: configData.distanciaMaximaCliente,
+              preferencias_apps: configData.preferenciasApps,
+              meta_diaria_lucro: configData.metaDiariaLucro,
+              custo_km: configData.custoKm,
+              custo_hora: configData.custoHora,
+            };
+
+            // Verificar se já existe configuração
+            const { data: existingSettings, error: checkError } = await supabase
+              .from('organization_settings')
+              .select('id')
+              .eq('organization_id', profile.current_organization_id)
+              .single();
+
+            let settingsError = null;
+            if (checkError && checkError.code === 'PGRST116') {
+              // Não existe, inserir
+              const { error: insertError } = await supabase
+                .from('organization_settings')
+                .insert({
+                  organization_id: profile.current_organization_id,
+                  ...settingsData,
+                });
+              settingsError = insertError;
+            } else if (!checkError) {
+              // Existe, atualizar
+              const { error: updateError } = await supabase
+                .from('organization_settings')
+                .update(settingsData)
+                .eq('organization_id', profile.current_organization_id);
+              settingsError = updateError;
+            } else {
+              settingsError = checkError;
+            }
+
+            if (settingsError) {
+              console.warn('Erro ao salvar configurações no Supabase:', settingsError);
+              // Não falhar completamente, apenas logar o erro
+            }
+          }
+        } catch (error) {
+          console.warn('Erro ao salvar configurações no Supabase:', error);
+          // Não falhar completamente, apenas logar o erro
+        }
+      }
+
       Alert.alert('Sucesso', 'Configurações salvas com sucesso!');
     } catch (error) {
       // Erro já tratado no Alert
@@ -435,24 +508,21 @@ export default function ConfiguracoesScreen({ navigation }) {
           </Text>
         </View>
 
-        {/* Perfis Pré-feitos */}
-        <Card>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>🎯 Perfis Pré-feitos</Text>
-          <Text style={[styles.sectionDescription, { color: theme.colors.textSecondary }]}>
-            Escolha um perfil pronto baseado no seu veículo ou configure manualmente abaixo
-          </Text>
-          
-          {veiculoCadastrado && (
+        {/* Informações do Veículo */}
+        {veiculoCadastrado && (
+          <Card>
             <View style={styles.veiculoInfoCard}>
               <View style={styles.veiculoInfoHeader}>
-                <Text style={styles.veiculoInfoIcon}>
-                  {veiculoCadastrado.tipo === 'moto' ? '🏍️' : '🚗'}
-                </Text>
+                <Ionicons 
+                  name={veiculoCadastrado.tipo === 'moto' ? 'bicycle-outline' : 'car-outline'} 
+                  size={24} 
+                  color={theme.colors.primary} 
+                />
                 <View style={styles.veiculoInfoContent}>
-                  <Text style={styles.veiculoInfoNome}>
+                  <Text style={[styles.veiculoInfoNome, { color: theme.colors.text }]}>
                     {veiculoCadastrado.marca} {veiculoCadastrado.modelo}
                   </Text>
-                  <Text style={styles.veiculoInfoDetalhes}>
+                  <Text style={[styles.veiculoInfoDetalhes, { color: theme.colors.textSecondary }]}>
                     {veiculoCadastrado.consumo} km/L • {getTipoVeiculoAtual() === 'moto' ? 'Moto' : 'Carro'}
                   </Text>
                 </View>
@@ -460,28 +530,32 @@ export default function ConfiguracoesScreen({ navigation }) {
                   onPress={() => navigation.navigate('Profile')}
                   style={styles.veiculoInfoButton}
                 >
-                  <Ionicons name="create-outline" size={18} color="#8B5CF6" />
+                  <Ionicons name="create-outline" size={18} color="#6BBD9B" />
                 </TouchableOpacity>
               </View>
-              <Text style={styles.veiculoInfoHint}>
+              <Text style={[styles.veiculoInfoHint, { color: theme.colors.textSecondary }]}>
                 Perfis filtrados automaticamente baseado no seu veículo cadastrado
               </Text>
             </View>
-          )}
-          
-          {!veiculoCadastrado && getTipoVeiculoAtual() !== 'auto' && (
+          </Card>
+        )}
+        
+        {!veiculoCadastrado && getTipoVeiculoAtual() !== 'auto' && (
+          <Card>
             <View style={styles.tipoVeiculoInfo}>
               <Ionicons name="information-circle" size={18} color="#3B82F6" />
-              <Text style={styles.tipoVeiculoInfoText}>
+              <Text style={[styles.tipoVeiculoInfoText, { color: theme.colors.text }]}>
                 Mostrando perfis para: <Text style={styles.tipoVeiculoInfoBold}>
-                  {getTipoVeiculoAtual() === 'moto' ? '🏍️ Moto' : '🚗 Carro'}
+                  {getTipoVeiculoAtual() === 'moto' ? 'Moto' : 'Carro'}
                 </Text>
                 {' '}(detectado automaticamente pelo consumo)
               </Text>
             </View>
-          )}
-          
-          {!veiculoCadastrado && getTipoVeiculoAtual() === 'auto' && (
+          </Card>
+        )}
+        
+        {!veiculoCadastrado && getTipoVeiculoAtual() === 'auto' && (
+          <Card>
             <TouchableOpacity
               style={[
                 styles.cadastrarVeiculoCard,
@@ -503,49 +577,21 @@ export default function ConfiguracoesScreen({ navigation }) {
               </View>
               <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
             </TouchableOpacity>
-          )}
-          <View style={styles.perfisPrefeitosContainer}>
-            {getPerfisFiltrados().length > 0 ? (
-              getPerfisFiltrados().map((perfil) => (
-                <TouchableOpacity
-                  key={perfil.id}
-                  style={[
-                    styles.perfilPrefeitoCard,
-                    {
-                      backgroundColor: theme.colors.input,
-                      borderColor: theme.colors.border,
-                    },
-                  ]}
-                  onPress={() => aplicarPerfilPrefeito(perfil)}
-                >
-                  <View style={styles.perfilPrefeitoHeader}>
-                    <Text style={styles.perfilPrefeitoIcon}>{perfil.icon}</Text>
-                    <View style={styles.perfilPrefeitoInfo}>
-                      <Text style={[styles.perfilPrefeitoLabel, { color: theme.colors.text }]}>{perfil.label}</Text>
-                      <Text style={[styles.perfilPrefeitoDesc, { color: theme.colors.textSecondary }]}>{perfil.desc}</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
-                  </View>
-                  <View style={[styles.perfilPrefeitoBadge, { backgroundColor: theme.colors.primary + '20' }]}>
-                    <Ionicons name="star" size={14} color={theme.colors.primary} />
-                    <Text style={[styles.perfilPrefeitoBadgeText, { color: theme.colors.primary }]}>Recomendado</Text>
-                  </View>
-                </TouchableOpacity>
-              ))
-            ) : (
-              <View style={styles.perfisVaziosContainer}>
-                <Ionicons name="car-outline" size={48} color="#9CA3AF" />
-                <Text style={[styles.perfisVaziosText, { color: theme.colors.textSecondary }]}>
-                  Configure o consumo do veículo acima para ver perfis recomendados
-                </Text>
-              </View>
-            )}
-          </View>
-        </Card>
+          </Card>
+        )}
+
+        {/* Perfis Pré-feitos */}
+        <PerfisPrefeitosSelector 
+          perfis={getPerfisFiltrados()} 
+          onAplicarPerfil={aplicarPerfilPrefeito}
+        />
 
         {/* Parâmetros Principais do Motor de Decisão */}
         <Card>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>⚙️ Configuração Manual</Text>
+          <View style={styles.sectionTitleContainer}>
+            <Ionicons name="settings-outline" size={20} color="#111827" />
+            <Text style={[styles.sectionTitle, { color: theme.colors.text, marginBottom: 0 }]}>Configuração Manual</Text>
+          </View>
           <Text style={[styles.sectionDescription, { color: theme.colors.textSecondary }]}>
             Configure os parâmetros essenciais para o motor de decisão funcionar
           </Text>
@@ -679,8 +725,8 @@ export default function ConfiguracoesScreen({ navigation }) {
             onPress={() => setShowAvancados(!showAvancados)}
           >
             <View style={styles.avancadosHeaderLeft}>
-              <Ionicons name="settings-outline" size={20} color={theme.colors.primary} />
-              <Text style={[styles.sectionTitle, { marginBottom: 0, marginLeft: 8, color: theme.colors.text }]}>⚙️ Parâmetros Avançados</Text>
+              <Ionicons name="settings-outline" size={20} color="#111827" />
+              <Text style={[styles.sectionTitle, { marginBottom: 0, marginLeft: 8, color: theme.colors.text }]}>Parâmetros Avançados</Text>
             </View>
             <Ionicons
               name={showAvancados ? 'chevron-up' : 'chevron-down'}
@@ -742,7 +788,7 @@ export default function ConfiguracoesScreen({ navigation }) {
                           <Switch
                             value={pref.preferido}
                             onValueChange={(value) => atualizarPreferenciaApp(plataforma.id, 'preferido', value)}
-                            trackColor={{ false: '#E5E7EB', true: '#8B5CF6' }}
+                            trackColor={{ false: '#E5E7EB', true: '#6BBD9B' }}
                             thumbColor={pref.preferido ? '#FFFFFF' : '#9CA3AF'}
                           />
                         </View>
@@ -782,37 +828,52 @@ export default function ConfiguracoesScreen({ navigation }) {
           )}
         </Card>
 
-        {/* Informações */}
-        <Card style={styles.infoCard}>
-          <View style={styles.infoHeader}>
-            <Ionicons name="information-circle-outline" size={24} color="#3B82F6" />
-            <Text style={styles.infoTitle}>Como funciona?</Text>
-          </View>
-          <Text style={styles.infoText}>
-            Com base nesses parâmetros, o motor de decisão calcula automaticamente se cada
-            corrida compensa ou não, levando em conta:
-          </Text>
-          <View style={styles.infoList}>
-            <Text style={styles.infoItem}>• R$/km mínimo aceitável - se a corrida paga bem pela distância</Text>
-            <Text style={styles.infoItem}>• R$/hora mínimo desejado - se vale o tempo investido</Text>
-            <Text style={styles.infoItem}>• Limites de distância e tempo - suas preferências pessoais</Text>
-            <Text style={styles.infoItem}>• Custo de combustível - calculado pelo consumo e preço</Text>
-            <Text style={styles.infoItem}>• Perfil de trabalho - peso dado para corridas curtas vs longas</Text>
-            <Text style={styles.infoItem}>• Preferências de apps - influência no score final</Text>
-          </View>
+        {/* Como Funciona */}
+        <Card>
+          <TouchableOpacity
+            style={styles.avancadosHeader}
+            onPress={() => setShowComoFunciona(!showComoFunciona)}
+          >
+            <View style={styles.avancadosHeaderLeft}>
+              <Ionicons name="information-circle-outline" size={20} color="#111827" />
+              <Text style={[styles.sectionTitle, { marginBottom: 0, marginLeft: 8, color: theme.colors.text }]}>Como funciona?</Text>
+            </View>
+            <Ionicons
+              name={showComoFunciona ? 'chevron-up' : 'chevron-down'}
+              size={24}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
+
+          {showComoFunciona && (
+            <>
+              <Text style={[styles.sectionDescription, { color: theme.colors.textSecondary }]}>
+                Com base nesses parâmetros, o motor de decisão calcula automaticamente se cada
+                corrida compensa ou não, levando em conta:
+              </Text>
+              <View style={styles.infoList}>
+                <Text style={[styles.infoItem, { color: theme.colors.textSecondary }]}>• R$/km mínimo aceitável - se a corrida paga bem pela distância</Text>
+                <Text style={[styles.infoItem, { color: theme.colors.textSecondary }]}>• R$/hora mínimo desejado - se vale o tempo investido</Text>
+                <Text style={[styles.infoItem, { color: theme.colors.textSecondary }]}>• Limites de distância e tempo - suas preferências pessoais</Text>
+                <Text style={[styles.infoItem, { color: theme.colors.textSecondary }]}>• Custo de combustível - calculado pelo consumo e preço</Text>
+                <Text style={[styles.infoItem, { color: theme.colors.textSecondary }]}>• Perfil de trabalho - peso dado para corridas curtas vs longas</Text>
+                <Text style={[styles.infoItem, { color: theme.colors.textSecondary }]}>• Preferências de apps - influência no score final</Text>
+              </View>
+            </>
+          )}
         </Card>
 
         {/* Botões de Ação */}
         <View style={styles.footer}>
           <Button
-            title="💾 Salvar Configurações"
+            title="Salvar Configurações"
             onPress={salvarConfig}
             loading={saving}
             style={styles.saveButton}
           />
 
           <Button
-            title="🗑️ Limpar Todos os Dados"
+            title="Limpar Todos os Dados"
             onPress={limparDados}
             variant="outline"
             style={[styles.saveButton, styles.dangerButton]}
@@ -829,10 +890,10 @@ export default function ConfiguracoesScreen({ navigation }) {
           <View style={styles.themeContainer}>
             <View style={styles.themeButtons}>
               {[
-                { mode: 'light', label: 'Claro', iconName: 'sunny-outline', desc: 'Tema claro' },
-                { mode: 'dark', label: 'Escuro', iconName: 'moon-outline', desc: 'Tema escuro' },
-                { mode: 'system', label: 'Auto', iconName: 'phone-portrait-outline', desc: 'Seguir sistema' },
-              ].map(({ mode, label, iconName, desc }) => {
+                { mode: 'light', label: 'Claro', iconName: 'sunny-outline' },
+                { mode: 'dark', label: 'Escuro', iconName: 'moon-outline' },
+                { mode: 'system', label: 'Auto', iconName: 'phone-portrait-outline' },
+              ].map(({ mode, label, iconName }) => {
                 const isSelected = themeMode === mode;
                 return (
                   <TouchableOpacity
@@ -863,16 +924,6 @@ export default function ConfiguracoesScreen({ navigation }) {
                     >
                       {label}
                     </Text>
-                    <Text
-                      style={[
-                        styles.themeButtonDesc,
-                        {
-                          color: isSelected ? '#E9D5FF' : theme.colors.textSecondary,
-                        },
-                      ]}
-                    >
-                      {desc}
-                    </Text>
                   </TouchableOpacity>
                 );
               })}
@@ -881,7 +932,7 @@ export default function ConfiguracoesScreen({ navigation }) {
               <Ionicons 
                 name={themeMode === 'dark' ? 'moon' : themeMode === 'light' ? 'sunny-outline' : 'phone-portrait-outline'} 
                 size={18} 
-                color={themeMode === 'dark' ? '#A78BFA' : themeMode === 'light' ? '#8B5CF6' : '#6B7280'} 
+                color={themeMode === 'dark' ? '#8DD4B8' : themeMode === 'light' ? '#6BBD9B' : '#6B7280'} 
               />
               <Text style={styles.themeInfoText}>
                 {themeMode === 'dark' 
@@ -941,6 +992,12 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#6B7280',
+  },
+  sectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 18,
@@ -1044,8 +1101,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   themeButtonActive: {
-    backgroundColor: '#8B5CF6',
-    borderColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
+    borderColor: '#6BBD9B',
   },
   themeButtonIcon: {
     fontSize: 24,
@@ -1103,8 +1160,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   perfilButtonActive: {
-    backgroundColor: '#8B5CF6',
-    borderColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
+    borderColor: '#6BBD9B',
   },
   perfilIcon: {
     fontSize: 32,
@@ -1174,61 +1231,12 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontWeight: '500',
   },
-  perfisPrefeitosContainer: {
-    gap: 12,
-    marginTop: 8,
-  },
-  perfilPrefeitoCard: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  perfilPrefeitoHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  perfilPrefeitoIcon: {
-    fontSize: 32,
-    marginRight: 12,
-  },
-  perfilPrefeitoInfo: {
-    flex: 1,
-  },
-  perfilPrefeitoLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  perfilPrefeitoDesc: {
-    fontSize: 13,
-    color: '#6B7280',
-  },
-  perfilPrefeitoBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: '#EDE9FE',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-  },
-  perfilPrefeitoBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#8B5CF6',
-  },
   tipoVeiculoInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#EFF6FF',
     padding: 12,
     borderRadius: 8,
-    marginBottom: 12,
     gap: 8,
   },
   tipoVeiculoInfoText: {
@@ -1238,16 +1246,6 @@ const styles = StyleSheet.create({
   },
   tipoVeiculoInfoBold: {
     fontWeight: '600',
-  },
-  perfisVaziosContainer: {
-    alignItems: 'center',
-    padding: 32,
-    gap: 12,
-  },
-  perfisVaziosText: {
-    fontSize: 14,
-    color: '#6B7280',
-    textAlign: 'center',
   },
   veiculoInfoCard: {
     backgroundColor: '#EFF6FF',
@@ -1342,8 +1340,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tipoVeiculoButtonActive: {
-    backgroundColor: '#8B5CF6',
-    borderColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
+    borderColor: '#6BBD9B',
   },
   tipoVeiculoButtonIcon: {
     fontSize: 32,

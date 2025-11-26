@@ -152,7 +152,7 @@ export default function CadastrarVeiculoScreen({ navigation }) {
                     <Ionicons
                       name={tipo === 'moto' ? 'bicycle-outline' : 'car-outline'}
                       size={24}
-                      color={veiculo.tipo === tipo ? '#FFFFFF' : '#8B5CF6'}
+                      color={veiculo.tipo === tipo ? '#FFFFFF' : '#6BBD9B'}
                     />
                   </View>
                   <Text
@@ -307,8 +307,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tipoVeiculoButtonActive: {
-    backgroundColor: '#8B5CF6',
-    borderColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
+    borderColor: '#6BBD9B',
   },
   tipoVeiculoButtonIconContainer: {
     marginBottom: 12,

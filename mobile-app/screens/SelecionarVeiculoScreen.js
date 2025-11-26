@@ -219,11 +219,11 @@ export default function SelecionarVeiculoScreen({ navigation }) {
                 <Ionicons
                   name={v.tipo === 'moto' ? 'bicycle-outline' : 'car-outline'}
                   size={24}
-                  color="#8B5CF6"
+                  color="#6BBD9B"
                 />
                 {v.id === 'fiat-uno' && isVeiculoSelecionado(v) && (
                   <View style={styles.iconBadge}>
-                    <Ionicons name="checkmark-circle" size={18} color="#8B5CF6" />
+                    <Ionicons name="checkmark-circle" size={18} color="#6BBD9B" />
                   </View>
                 )}
               </View>
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   veiculoItemIconContainerSelected: {
     backgroundColor: '#EDE9FE',
     borderWidth: 2,
-    borderColor: '#8B5CF6',
+    borderColor: '#6BBD9B',
   },
   iconBadge: {
     position: 'absolute',
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#8B5CF6',
+    borderColor: '#6BBD9B',
   },
   veiculoItemInfo: {
     flex: 1,

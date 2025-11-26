@@ -9,10 +9,10 @@ const TIPOS_ICONS = {
   combustivel: { icon: 'car-outline', color: '#F59E0B' },
   manutencao: { icon: 'build-outline', color: '#6366F1' },
   alimentacao: { icon: 'restaurant-outline', color: '#EC4899' },
-  estacionamento: { icon: 'location-outline', color: '#10B981' },
+  estacionamento: { icon: 'location-outline', color: '#6BBD9B' },
   lavagem: { icon: 'water-outline', color: '#06B6D4' },
   multa: { icon: 'document-text-outline', color: '#EF4444' },
-  seguro: { icon: 'shield-checkmark-outline', color: '#8B5CF6' },
+  seguro: { icon: 'shield-checkmark-outline', color: '#6BBD9B' },
   outros: { icon: 'ellipsis-horizontal-outline', color: '#6B7280' },
 };
 

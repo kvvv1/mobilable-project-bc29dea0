@@ -322,7 +322,7 @@ export default function SignUpScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <LinearGradient
-        colors={['#8B5CF6', '#7C3AED', '#6D28D9']}
+        colors={['#6BBD9B', '#5BA587', '#4B8F75']}
         style={styles.gradient}
       >
         <ScrollView
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
   nextButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#8B5CF6',
+    color: '#6BBD9B',
   },
   signUpButton: {
     backgroundColor: '#FFFFFF',
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
   signUpButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#8B5CF6',
+    color: '#6BBD9B',
   },
   loginLinkContainer: {
     flexDirection: 'row',

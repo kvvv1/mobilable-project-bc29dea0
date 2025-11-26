@@ -6,7 +6,7 @@ import { Formatters } from '../../utils/formatters';
 
 const VIABILIDADE_CONFIG = {
   excelente: {
-    color: '#10B981',
+    color: '#6BBD9B',
     icon: 'checkmark-circle',
     label: 'Excelente',
   },
@@ -78,7 +78,7 @@ export default function ViabilidadeCard({ analise }) {
             style={[
               styles.detailValue,
               {
-                color: analise.lucroLiquido > 0 ? '#10B981' : '#EF4444',
+                color: analise.lucroLiquido > 0 ? '#6BBD9B' : '#EF4444',
                 fontWeight: 'bold',
               },
             ]}
@@ -110,7 +110,7 @@ export default function ViabilidadeCard({ analise }) {
               <Ionicons
                 name={analise.atendeRsPorKm ? 'checkmark-circle' : 'close-circle'}
                 size={16}
-                color={analise.atendeRsPorKm ? '#10B981' : '#EF4444'}
+                color={analise.atendeRsPorKm ? '#6BBD9B' : '#EF4444'}
                 style={styles.statusIcon}
               />
             )}
@@ -130,7 +130,7 @@ export default function ViabilidadeCard({ analise }) {
               <Ionicons
                 name={analise.atendeRsPorHora ? 'checkmark-circle' : 'close-circle'}
                 size={16}
-                color={analise.atendeRsPorHora ? '#10B981' : '#EF4444'}
+                color={analise.atendeRsPorHora ? '#6BBD9B' : '#EF4444'}
                 style={styles.statusIcon}
               />
             )}

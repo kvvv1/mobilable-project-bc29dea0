@@ -164,7 +164,7 @@ export default function RelatoriosScreen({ navigation }) {
     propsForDots: {
       r: '4',
       strokeWidth: '2',
-      stroke: '#8B5CF6',
+      stroke: '#6BBD9B',
     },
   };
 
@@ -294,9 +294,9 @@ export default function RelatoriosScreen({ navigation }) {
               name: label.charAt(0).toUpperCase() + label.slice(1),
               value: dadosDespesas.data[index],
               color: [
-                '#8B5CF6',
+                '#6BBD9B',
                 '#EF4444',
-                '#10B981',
+                '#6BBD9B',
                 '#F59E0B',
                 '#3B82F6',
                 '#EC4899',
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   periodoButtonActive: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
   },
   periodoButtonText: {
     fontSize: 14,
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   resumoCard: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
     marginHorizontal: 20,
     marginBottom: 16,
   },
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   resumoValueSuccess: {
-    color: '#10B981',
+    color: '#6BBD9B',
   },
   resumoValueDanger: {
     color: '#FEF3C7',
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   corridaValor: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#10B981',
+    color: '#6BBD9B',
   },
   maisItems: {
     fontSize: 12,

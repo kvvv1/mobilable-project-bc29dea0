@@ -83,7 +83,7 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const getLucroColor = () => {
-    if (estatisticas.lucroLiquido > 0) return '#10B981';
+    if (estatisticas.lucroLiquido > 0) return '#6BBD9B';
     if (estatisticas.lucroLiquido < 0) return '#EF4444';
     return '#6B7280';
   };
@@ -285,7 +285,7 @@ export default function DashboardScreen({ navigation }) {
         <TouchableOpacity activeOpacity={0.8} style={styles.metricCardWrapper}>
           <Card style={[styles.metricCard, styles.metricCardReceita]}>
             <View style={styles.metricIconContainer}>
-              <Ionicons name="cash" size={28} color="#10B981" />
+              <Ionicons name="cash" size={28} color="#6BBD9B" />
             </View>
             <Text style={styles.metricValue}>
               {Formatters.currency(estatisticas.totalReceitas)}
@@ -295,7 +295,7 @@ export default function DashboardScreen({ navigation }) {
               <Ionicons 
                 name={tendencias.receitas.isPositive ? "arrow-up" : "arrow-down"} 
                 size={12} 
-                color={tendencias.receitas.isPositive ? "#10B981" : "#EF4444"} 
+                color={tendencias.receitas.isPositive ? "#6BBD9B" : "#EF4444"} 
               />
               <Text style={[
                 styles.metricTrendText,
@@ -320,7 +320,7 @@ export default function DashboardScreen({ navigation }) {
               <Ionicons 
                 name={tendencias.despesas.isPositive ? "arrow-down" : "arrow-up"} 
                 size={12} 
-                color={tendencias.despesas.isPositive ? "#10B981" : "#EF4444"} 
+                color={tendencias.despesas.isPositive ? "#6BBD9B" : "#EF4444"} 
               />
               <Text style={[
                 styles.metricTrendText,
@@ -353,14 +353,14 @@ export default function DashboardScreen({ navigation }) {
         <TouchableOpacity activeOpacity={0.8} style={styles.metricCardWrapper}>
           <Card style={[styles.metricCard, styles.metricCardDistancia]}>
             <View style={styles.metricIconContainer}>
-              <Ionicons name="location" size={28} color="#10B981" />
+              <Ionicons name="location" size={28} color="#6BBD9B" />
             </View>
             <Text style={styles.metricValue}>
               {Formatters.distance(estatisticas.totalKm)}
             </Text>
             <Text style={styles.metricLabel}>Distância</Text>
             <View style={styles.metricTrend}>
-              <Ionicons name="speedometer" size={12} color="#10B981" />
+              <Ionicons name="speedometer" size={12} color="#6BBD9B" />
               <Text style={[styles.metricTrendText, styles.metricTrendTextInfo]}>
                 Média: {estatisticas.totalCorridas > 0 ? Formatters.distance(estatisticas.totalKm / estatisticas.totalCorridas) : '0 km'}
               </Text>
@@ -376,7 +376,7 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.sectionTitle}>Insights</Text>
         </View>
         <View style={styles.insightItem}>
-          <Ionicons name="time-outline" size={20} color="#8B5CF6" />
+          <Ionicons name="time-outline" size={20} color="#6BBD9B" />
           <View style={styles.insightContent}>
             <Text style={styles.insightLabel}>Melhor Horário</Text>
             <Text style={styles.insightValue}>
@@ -385,7 +385,7 @@ export default function DashboardScreen({ navigation }) {
           </View>
         </View>
         <View style={styles.insightItem}>
-          <Ionicons name="phone-portrait-outline" size={20} color="#8B5CF6" />
+          <Ionicons name="phone-portrait-outline" size={20} color="#6BBD9B" />
           <View style={styles.insightContent}>
             <Text style={styles.insightLabel}>Melhor Plataforma</Text>
             <Text style={styles.insightValue}>
@@ -396,14 +396,14 @@ export default function DashboardScreen({ navigation }) {
           </View>
         </View>
         <View style={styles.insightItem}>
-          <Ionicons name="calendar-outline" size={20} color="#8B5CF6" />
+          <Ionicons name="calendar-outline" size={20} color="#6BBD9B" />
           <View style={styles.insightContent}>
             <Text style={styles.insightLabel}>Corridas Hoje</Text>
             <Text style={styles.insightValue}>{estatisticas.corridasHoje}</Text>
           </View>
         </View>
         <View style={styles.insightItem}>
-          <Ionicons name="stats-chart-outline" size={20} color="#8B5CF6" />
+          <Ionicons name="stats-chart-outline" size={20} color="#6BBD9B" />
           <View style={styles.insightContent}>
             <Text style={styles.insightLabel}>Ticket Médio</Text>
             <Text style={styles.insightValue}>
@@ -425,7 +425,7 @@ export default function DashboardScreen({ navigation }) {
           title="Adicionar Despesa"
           onPress={() => navigation.getParent()?.navigate('Saidas')}
           variant="outline"
-          icon={<Ionicons name="add-circle-outline" size={20} color="#8B5CF6" />}
+          icon={<Ionicons name="add-circle-outline" size={20} color="#6BBD9B" />}
           style={styles.actionButton}
         />
       </View>
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 20,
     overflow: 'hidden',
-    shadowColor: '#8B5CF6',
+    shadowColor: '#6BBD9B',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   lucroCardPositive: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
   },
   lucroCardNegative: {
     backgroundColor: '#EF4444',
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
   },
   metricCardReceita: {
     borderLeftWidth: 4,
-    borderLeftColor: '#10B981',
+    borderLeftColor: '#6BBD9B',
   },
   metricCardDespesa: {
     borderLeftWidth: 4,
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
   },
   metricCardDistancia: {
     borderLeftWidth: 4,
-    borderLeftColor: '#10B981',
+    borderLeftColor: '#6BBD9B',
   },
   metricIconContainer: {
     width: 56,
@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
   },
   metricTrendText: {
     fontSize: 11,
-    color: '#10B981',
+    color: '#6BBD9B',
     fontWeight: '600',
     marginLeft: 4,
   },

@@ -22,7 +22,7 @@ const TUTORIAL_STEPS = [
     title: 'Dashboard',
     subtitle: 'Visão Geral',
     description: 'Aqui você vê todas as suas métricas financeiras em tempo real: lucro líquido, receitas, despesas e insights inteligentes sobre seus melhores horários e plataformas.',
-    color: '#8B5CF6',
+    color: '#6BBD9B',
     features: [
       '💰 Lucro líquido do período',
       '📊 Gráficos de receitas e despesas',
@@ -36,7 +36,7 @@ const TUTORIAL_STEPS = [
     title: 'Capturar Corrida',
     subtitle: 'Análise Inteligente',
     description: 'Tire uma foto da proposta de corrida ou preencha manualmente. O app analisa automaticamente se a corrida compensa baseado em distância, tempo, custos e sua hora trabalhada.',
-    color: '#10B981',
+    color: '#6BBD9B',
     features: [
       '📸 Captura por foto ou manual',
       '🧮 Análise automática de viabilidade',
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
     borderRadius: 2,
   },
   progressText: {
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   },
   paginationDotActive: {
     width: 24,
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
   },
   buttonsContainer: {
     flexDirection: 'row',

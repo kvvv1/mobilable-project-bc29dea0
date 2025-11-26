@@ -275,7 +275,7 @@ export default function OnboardingScreen({ navigation }) {
   const renderStep1 = () => (
     <View style={styles.stepContainer}>
       <View style={styles.iconContainer}>
-        <Ionicons name="car-sport" size={64} color="#8B5CF6" />
+        <Ionicons name="car-sport" size={64} color="#6BBD9B" />
       </View>
       <Text style={styles.stepTitle}>Qual seu tipo de veículo?</Text>
       <Text style={styles.stepSubtitle}>
@@ -296,7 +296,7 @@ export default function OnboardingScreen({ navigation }) {
           <Text style={styles.optionSubtitle}>Mais econômico</Text>
           {tipoVeiculo === 'moto' && (
             <View style={styles.selectedBadge}>
-              <Ionicons name="checkmark-circle" size={24} color="#8B5CF6" />
+              <Ionicons name="checkmark-circle" size={24} color="#6BBD9B" />
             </View>
           )}
         </TouchableOpacity>
@@ -314,7 +314,7 @@ export default function OnboardingScreen({ navigation }) {
           <Text style={styles.optionSubtitle}>Mais confortável</Text>
           {tipoVeiculo === 'carro' && (
             <View style={styles.selectedBadge}>
-              <Ionicons name="checkmark-circle" size={24} color="#8B5CF6" />
+              <Ionicons name="checkmark-circle" size={24} color="#6BBD9B" />
             </View>
           )}
         </TouchableOpacity>
@@ -361,7 +361,7 @@ export default function OnboardingScreen({ navigation }) {
                 </Text>
               </View>
               {veiculoSelecionado?.id === vehicle.id && (
-                <Ionicons name="checkmark-circle" size={24} color="#8B5CF6" />
+                <Ionicons name="checkmark-circle" size={24} color="#6BBD9B" />
               )}
             </TouchableOpacity>
           ))}
@@ -376,7 +376,7 @@ export default function OnboardingScreen({ navigation }) {
             }}
             activeOpacity={0.7}
           >
-            <Ionicons name="add-circle-outline" size={32} color="#8B5CF6" />
+            <Ionicons name="add-circle-outline" size={32} color="#6BBD9B" />
             <View style={styles.vehicleInfo}>
               <Text style={styles.vehicleName}>Cadastrar Personalizado</Text>
               <Text style={styles.vehicleDetails}>
@@ -432,7 +432,7 @@ export default function OnboardingScreen({ navigation }) {
   const renderStep3 = () => (
     <View style={styles.stepContainer}>
       <View style={styles.iconContainer}>
-        <Ionicons name="settings-outline" size={64} color="#8B5CF6" />
+        <Ionicons name="settings-outline" size={64} color="#6BBD9B" />
       </View>
       <Text style={styles.stepTitle}>Configure seus parâmetros</Text>
       <Text style={styles.stepSubtitle}>
@@ -608,11 +608,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5E7EB',
   },
   progressDotActive: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
     width: 24,
   },
   progressDotCompleted: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
   },
   placeholder: {
     width: 40,
@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   optionCardSelected: {
-    borderColor: '#8B5CF6',
+    borderColor: '#6BBD9B',
     backgroundColor: '#F5F3FF',
   },
   optionIcon: {
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   vehicleCardSelected: {
-    borderColor: '#8B5CF6',
+    borderColor: '#6BBD9B',
     backgroundColor: '#F5F3FF',
   },
   vehicleIcon: {
@@ -764,7 +764,7 @@ const styles = StyleSheet.create({
   },
   profileOptionSelected: {
     backgroundColor: '#F5F3FF',
-    borderColor: '#8B5CF6',
+    borderColor: '#6BBD9B',
   },
   profileOptionText: {
     fontSize: 14,
@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   profileOptionTextSelected: {
-    color: '#8B5CF6',
+    color: '#6BBD9B',
   },
   footer: {
     padding: 24,
@@ -781,7 +781,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#E5E7EB',
   },
   nextButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
     borderRadius: 12,
     height: 56,
     flexDirection: 'row',
@@ -795,7 +795,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   finishButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
     borderRadius: 12,
     height: 56,
     flexDirection: 'row',

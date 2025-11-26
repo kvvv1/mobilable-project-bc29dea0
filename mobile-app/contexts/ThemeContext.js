@@ -7,14 +7,14 @@ const THEME_STORAGE_KEY = 'app_theme';
 const lightTheme = {
   mode: 'light',
   colors: {
-    primary: '#8B5CF6',
+    primary: '#6BBD9B',
     background: '#F9FAFB',
     surface: '#FFFFFF',
     text: '#111827',
     textSecondary: '#6B7280',
     border: '#E5E7EB',
     error: '#EF4444',
-    success: '#10B981',
+    success: '#6BBD9B',
     warning: '#F59E0B',
     card: '#FFFFFF',
     input: '#F9FAFB',
@@ -24,14 +24,14 @@ const lightTheme = {
 const darkTheme = {
   mode: 'dark',
   colors: {
-    primary: '#A78BFA',
+    primary: '#8DD4B8',
     background: '#0F172A', // Mais claro que preto puro, melhor visibilidade
     surface: '#1E293B', // Mais claro para melhor contraste
     text: '#F1F5F9', // Texto mais claro e legível
     textSecondary: '#CBD5E1', // Texto secundário mais visível
     border: '#475569', // Bordas mais visíveis
     error: '#F87171',
-    success: '#34D399',
+    success: '#8DD4B8',
     warning: '#FBBF24',
     card: '#1E293B', // Cards com mais contraste
     input: '#334155', // Inputs mais claros e visíveis

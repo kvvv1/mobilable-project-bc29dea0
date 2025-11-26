@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { logger } from './utils/logger';
 import { supabase } from './services/authService';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import LoadingScreen from './components/LoadingScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -38,7 +39,7 @@ function DashboardStack() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#8B5CF6',
+          backgroundColor: '#6BBD9B',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
@@ -77,7 +78,7 @@ function EntradaStack() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#8B5CF6',
+          backgroundColor: '#6BBD9B',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
@@ -90,7 +91,7 @@ function EntradaStack() {
         component={CapturarCorridaScreen}
         options={{
           title: 'Capturar Corrida',
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -111,7 +112,7 @@ function SaidasStack() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#8B5CF6',
+          backgroundColor: '#6BBD9B',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
@@ -124,7 +125,7 @@ function SaidasStack() {
         component={AdicionarDespesaScreen}
         options={{
           title: 'Adicionar Despesa',
-          headerShown: true,
+          headerShown: false,
         }}
       />
     </Stack.Navigator>
@@ -137,7 +138,7 @@ function ProfileStack() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#8B5CF6',
+          backgroundColor: '#6BBD9B',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
@@ -200,7 +201,7 @@ function ConfiguracoesStack() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#8B5CF6',
+          backgroundColor: '#6BBD9B',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
@@ -267,11 +268,7 @@ function AppContent() {
   }, [isAuthenticated, onboardingCompleted, tutorialCompleted, loading, user]);
   
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#8B5CF6" />
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   // Determinar qual tela mostrar - FLUXO EXATO: LOGIN/CADASTRO → ONBOARDING → TUTORIAL → APP
@@ -344,7 +341,7 @@ function AppContent() {
 
                     return <Ionicons name={iconName} size={size} color={color} />;
                   },
-                  tabBarActiveTintColor: '#8B5CF6',
+                  tabBarActiveTintColor: '#6BBD9B',
                   tabBarInactiveTintColor: '#9CA3AF',
                   tabBarStyle: {
                     paddingBottom: 5,
@@ -387,9 +384,7 @@ function AppContent() {
             </>
           ) : (
             // Fallback: mostrar loading se nenhuma condição for verdadeira
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#8B5CF6" />
-            </View>
+            <LoadingScreen />
           )}
         </NavigationContainer>
       </SafeAreaView>

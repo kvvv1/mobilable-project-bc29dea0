@@ -63,7 +63,7 @@ export default function ForgotPasswordScreen({ navigation }) {
     return (
       <View style={styles.container}>
         <LinearGradient
-          colors={['#8B5CF6', '#7C3AED', '#6D28D9']}
+          colors={['#6BBD9B', '#5BA587', '#4B8F75']}
           style={styles.gradient}
         >
           <ScrollView
@@ -72,7 +72,7 @@ export default function ForgotPasswordScreen({ navigation }) {
           >
             <View style={styles.successContainer}>
               <View style={styles.successIcon}>
-                <Ionicons name="checkmark-circle" size={80} color="#10B981" />
+                <Ionicons name="checkmark-circle" size={80} color="#6BBD9B" />
               </View>
               <Text style={styles.successTitle}>Email enviado!</Text>
               <Text style={styles.successText}>
@@ -101,7 +101,7 @@ export default function ForgotPasswordScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <LinearGradient
-        colors={['#8B5CF6', '#7C3AED', '#6D28D9']}
+        colors={['#6BBD9B', '#5BA587', '#4B8F75']}
         style={styles.gradient}
       >
         <ScrollView
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   sendButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#8B5CF6',
+    color: '#6BBD9B',
   },
   loginLink: {
     alignSelf: 'center',

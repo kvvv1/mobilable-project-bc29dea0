@@ -259,7 +259,7 @@ export default function ProfileScreen({ navigation }) {
       <View style={[styles.header, { paddingTop: Math.max(insets.top + 10, 20) }]}>
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
-            <Ionicons name="person" size={48} color="#8B5CF6" />
+            <Ionicons name="person" size={48} color="#6BBD9B" />
           </View>
           <TouchableOpacity style={styles.editAvatarButton}>
             <Ionicons name="camera" size={16} color="#FFFFFF" />
@@ -277,7 +277,7 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.statLabel}>Corridas Totais</Text>
         </Card>
         <Card style={styles.statCard}>
-          <Ionicons name="cash" size={24} color="#10B981" />
+          <Ionicons name="cash" size={24} color="#6BBD9B" />
           <Text style={styles.statValue}>
             {Formatters.currency(estatisticas.totalReceitas)}
           </Text>
@@ -301,7 +301,7 @@ export default function ProfileScreen({ navigation }) {
         
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
-            <Ionicons name="time-outline" size={20} color="#8B5CF6" />
+            <Ionicons name="time-outline" size={20} color="#6BBD9B" />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Tempo Total</Text>
               <Text style={styles.infoValue}>
@@ -313,7 +313,7 @@ export default function ProfileScreen({ navigation }) {
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
-            <Ionicons name="calendar-outline" size={20} color="#8B5CF6" />
+            <Ionicons name="calendar-outline" size={20} color="#6BBD9B" />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Melhor Dia</Text>
               <Text style={styles.infoValue}>
@@ -325,7 +325,7 @@ export default function ProfileScreen({ navigation }) {
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
-            <Ionicons name="stats-chart-outline" size={20} color="#8B5CF6" />
+            <Ionicons name="stats-chart-outline" size={20} color="#6BBD9B" />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Ticket Médio</Text>
               <Text style={styles.infoValue}>
@@ -348,7 +348,7 @@ export default function ProfileScreen({ navigation }) {
           onPress={() => navigation.navigate('HistoricoCorridas')}
         >
           <View style={styles.actionIconContainer}>
-            <Ionicons name="list" size={24} color="#8B5CF6" />
+            <Ionicons name="list" size={24} color="#6BBD9B" />
           </View>
           <View style={styles.actionContent}>
             <Text style={styles.actionTitle}>Histórico Completo</Text>
@@ -362,7 +362,7 @@ export default function ProfileScreen({ navigation }) {
           onPress={() => navigation.navigate('Metas')}
         >
           <View style={styles.actionIconContainer}>
-            <Ionicons name="flag" size={24} color="#8B5CF6" />
+            <Ionicons name="flag" size={24} color="#6BBD9B" />
           </View>
           <View style={styles.actionContent}>
             <Text style={styles.actionTitle}>Metas e Objetivos</Text>
@@ -376,7 +376,7 @@ export default function ProfileScreen({ navigation }) {
           onPress={exportarDados}
         >
           <View style={styles.actionIconContainer}>
-            <Ionicons name="download-outline" size={24} color="#8B5CF6" />
+            <Ionicons name="download-outline" size={24} color="#6BBD9B" />
           </View>
           <View style={styles.actionContent}>
             <Text style={styles.actionTitle}>Exportar Dados</Text>
@@ -419,7 +419,7 @@ export default function ProfileScreen({ navigation }) {
               style={styles.veiculoEditar}
               onPress={() => setShowOpcoesVeiculo(true)}
             >
-              <Ionicons name="create-outline" size={20} color="#8B5CF6" />
+              <Ionicons name="create-outline" size={20} color="#6BBD9B" />
             </TouchableOpacity>
           </View>
         ) : (
@@ -427,7 +427,7 @@ export default function ProfileScreen({ navigation }) {
             style={styles.veiculoAdicionar}
             onPress={() => setShowOpcoesVeiculo(true)}
           >
-            <Ionicons name="add-circle-outline" size={24} color="#8B5CF6" />
+            <Ionicons name="add-circle-outline" size={24} color="#6BBD9B" />
             <Text style={styles.veiculoAdicionarText}>Adicionar Veículo</Text>
           </TouchableOpacity>
         )}
@@ -530,7 +530,7 @@ export default function ProfileScreen({ navigation }) {
               activeOpacity={0.7}
             >
               <View style={styles.opcaoIconContainer}>
-                <Ionicons name="list" size={32} color="#8B5CF6" />
+                <Ionicons name="list" size={32} color="#6BBD9B" />
               </View>
               <View style={styles.opcaoContent}>
                 <Text style={styles.opcaoTitle}>Selecione por Modelo</Text>
@@ -550,7 +550,7 @@ export default function ProfileScreen({ navigation }) {
               activeOpacity={0.7}
             >
               <View style={styles.opcaoIconContainer}>
-                <Ionicons name="create-outline" size={32} color="#10B981" />
+                <Ionicons name="create-outline" size={32} color="#6BBD9B" />
               </View>
               <View style={styles.opcaoContent}>
                 <Text style={styles.opcaoTitle}>Cadastrar Veículo Personalizado</Text>
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
-    borderColor: '#8B5CF6',
+    borderColor: '#6BBD9B',
   },
   editAvatarButton: {
     position: 'absolute',
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#6BBD9B',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
@@ -771,7 +771,7 @@ const styles = StyleSheet.create({
   },
   veiculoConsumo: {
     fontSize: 14,
-    color: '#8B5CF6',
+    color: '#6BBD9B',
     fontWeight: '600',
   },
   veiculoEditar: {
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
   veiculoAdicionarText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#8B5CF6',
+    color: '#6BBD9B',
   },
   modalOverlay: {
     flex: 1,

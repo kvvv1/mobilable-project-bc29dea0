@@ -65,7 +65,7 @@ export default function TemplatesList({ onSelectTemplate, onSaveAsTemplate }) {
           accessibilityLabel="Adicionar novo template"
           accessibilityHint="Toque duas vezes para salvar os dados atuais como template"
         >
-          <Ionicons name="add-circle-outline" size={24} color="#8B5CF6" />
+          <Ionicons name="add-circle-outline" size={24} color="#6BBD9B" />
         </TouchableOpacity>
       </View>
       <View style={styles.templatesList}>

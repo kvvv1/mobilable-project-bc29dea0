@@ -10,12 +10,16 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthService } from '../services/authService';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function LoginScreen({ navigation }) {
   const insets = useSafeAreaInsets();
@@ -89,19 +93,29 @@ export default function LoginScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <LinearGradient
-        colors={['#8B5CF6', '#7C3AED', '#6D28D9']}
+        colors={['#6BBD9B', '#5BA587', '#4B8F75']}
         style={styles.gradient}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 10, paddingBottom: insets.bottom + 10 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          bounces={false}
         >
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.logoContainer}>
               <View style={styles.logoCircle}>
-                <Ionicons name="car-sport" size={48} color="#FFFFFF" />
+                <View style={styles.logoInner}>
+                  <Image
+                    source={require('../assets/splash-icon.png')}
+                    style={styles.logo}
+                    resizeMode="contain"
+                    onError={(error) => {
+                      console.log('Erro ao carregar logo:', error);
+                    }}
+                  />
+                </View>
               </View>
             </View>
             <Text style={styles.title}>Bem-vindo de volta!</Text>
@@ -232,35 +246,54 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingBottom: 40,
+    justifyContent: 'center',
+    paddingVertical: 20,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 48,
-    marginTop: 20,
+    marginBottom: SCREEN_HEIGHT < 700 ? 20 : 28,
   },
   logoContainer: {
-    marginBottom: 24,
+    marginBottom: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logoCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    width: SCREEN_HEIGHT < 700 ? 140 : SCREEN_HEIGHT < 800 ? 160 : 180,
+    height: SCREEN_HEIGHT < 700 ? 140 : SCREEN_HEIGHT < 800 ? 160 : 180,
+    borderRadius: SCREEN_HEIGHT < 700 ? 70 : SCREEN_HEIGHT < 800 ? 80 : 90,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderWidth: 4,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  logoInner: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SCREEN_HEIGHT < 700 ? 18 : SCREEN_HEIGHT < 800 ? 20 : 22,
+  },
+  logo: {
+    width: '100%',
+    height: '100%',
   },
   title: {
-    fontSize: 32,
+    fontSize: SCREEN_HEIGHT < 700 ? 26 : 32,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 8,
+    marginBottom: 6,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: SCREEN_HEIGHT < 700 ? 14 : 16,
     color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
     paddingHorizontal: 20,
@@ -269,7 +302,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: SCREEN_HEIGHT < 700 ? 16 : 20,
   },
   label: {
     fontSize: 14,
@@ -283,7 +316,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: 12,
     paddingHorizontal: 16,
-    height: 56,
+    height: SCREEN_HEIGHT < 700 ? 50 : 56,
     borderWidth: 2,
     borderColor: 'transparent',
   },
@@ -309,7 +342,7 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    marginBottom: 24,
+    marginBottom: SCREEN_HEIGHT < 700 ? 16 : 24,
   },
   forgotPasswordText: {
     fontSize: 14,
@@ -319,10 +352,10 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    height: 56,
+    height: SCREEN_HEIGHT < 700 ? 50 : 56,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: SCREEN_HEIGHT < 700 ? 16 : 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -333,19 +366,19 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   loginButtonText: {
-    fontSize: 18,
+    fontSize: SCREEN_HEIGHT < 700 ? 16 : 18,
     fontWeight: 'bold',
-    color: '#8B5CF6',
+    color: '#6BBD9B',
   },
   googleButton: {
     backgroundColor: '#4285F4',
     borderRadius: 12,
-    height: 56,
+    height: SCREEN_HEIGHT < 700 ? 50 : 56,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 12,
-    marginBottom: 24,
+    marginBottom: SCREEN_HEIGHT < 700 ? 16 : 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -356,14 +389,14 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   googleButtonText: {
-    fontSize: 18,
+    fontSize: SCREEN_HEIGHT < 700 ? 16 : 18,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: SCREEN_HEIGHT < 700 ? 16 : 24,
   },
   dividerLine: {
     flex: 1,

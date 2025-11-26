@@ -129,7 +129,7 @@ export default function MetasScreen({ navigation }) {
   };
 
   const getProgressColor = (progresso) => {
-    if (progresso >= 100) return '#10B981';
+    if (progresso >= 100) return '#6BBD9B';
     if (progresso >= 75) return '#22C55E';
     if (progresso >= 50) return '#EAB308';
     if (progresso >= 25) return '#F97316';
@@ -165,7 +165,7 @@ export default function MetasScreen({ navigation }) {
         <Card style={styles.metaCard}>
           <View style={styles.metaHeader}>
             <View style={styles.metaIconContainer}>
-              <Ionicons name="cash" size={24} color="#10B981" />
+              <Ionicons name="cash" size={24} color="#6BBD9B" />
             </View>
             <View style={styles.metaHeaderText}>
               <Text style={styles.metaTitle}>Receita Diária</Text>
@@ -275,7 +275,7 @@ export default function MetasScreen({ navigation }) {
         <Card style={styles.metaCard}>
           <View style={styles.metaHeader}>
             <View style={styles.metaIconContainer}>
-              <Ionicons name="car" size={24} color="#8B5CF6" />
+              <Ionicons name="car" size={24} color="#6BBD9B" />
             </View>
             <View style={styles.metaHeaderText}>
               <Text style={styles.metaTitle}>Corridas Diárias</Text>
