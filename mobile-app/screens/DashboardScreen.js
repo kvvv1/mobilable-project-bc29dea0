@@ -8,15 +8,22 @@ import {
   Dimensions,
   TouchableOpacity,
   Animated,
+  Alert,
+  Modal,
+  Image,
+  TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import FiltrosAvancados from '../components/FiltrosAvancados';
 import { StorageService } from '../services/storage';
 import AnaliseService from '../services/analiseCorridas';
 import { Formatters } from '../utils/formatters';
+import { Masks } from '../utils/masks';
+import moment from 'moment';
 // LinearGradient será implementado com View e cores gradientes
 
 const screenWidth = Dimensions.get('window').width;
@@ -45,6 +52,22 @@ export default function DashboardScreen({ navigation }) {
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Estados para histórico de corridas
+  const [corridas, setCorridas] = useState([]);
+  const [filtro, setFiltro] = useState('todas'); // todas, hoje, semana, mes
+  const [filtrosAvancados, setFiltrosAvancados] = useState({
+    plataforma: '',
+    valorMin: '',
+    valorMax: '',
+    viabilidade: '',
+    busca: '',
+  });
+  const [filtrosModalVisible, setFiltrosModalVisible] = useState(false);
+  const [busca, setBusca] = useState('');
+  const [corridaSelecionada, setCorridaSelecionada] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [mostrarHistorico, setMostrarHistorico] = useState(false);
 
   const loadData = async () => {
     try {
@@ -58,11 +81,88 @@ export default function DashboardScreen({ navigation }) {
       // Calcular tendências reais
       const tendenciasReais = await calcularTendencias();
       setTendencias(tendenciasReais);
+      
+      // Carregar histórico de corridas
+      await loadHistoricoCorridas();
     } catch (error) {
       console.error('Erro ao carregar estatísticas:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+  
+  const loadHistoricoCorridas = async () => {
+    try {
+      const todasCorridas = await StorageService.getCorridas();
+      let corridasFiltradas = todasCorridas;
+
+      // Filtro por período
+      const agora = moment();
+      switch (filtro) {
+        case 'hoje':
+          corridasFiltradas = corridasFiltradas.filter(c => 
+            moment(c.createdAt).isSame(agora, 'day')
+          );
+          break;
+        case 'semana':
+          corridasFiltradas = corridasFiltradas.filter(c => 
+            moment(c.createdAt).isAfter(agora.subtract(7, 'days'))
+          );
+          break;
+        case 'mes':
+          corridasFiltradas = corridasFiltradas.filter(c => 
+            moment(c.createdAt).isAfter(agora.subtract(30, 'days'))
+          );
+          break;
+      }
+
+      // Filtros avançados
+      if (filtrosAvancados.plataforma) {
+        corridasFiltradas = corridasFiltradas.filter(c => 
+          c.plataforma?.toLowerCase() === filtrosAvancados.plataforma.toLowerCase()
+        );
+      }
+
+      if (filtrosAvancados.valorMin) {
+        const valorMin = Masks.unformatMoney(filtrosAvancados.valorMin);
+        corridasFiltradas = corridasFiltradas.filter(c => c.valor >= valorMin);
+      }
+
+      if (filtrosAvancados.valorMax) {
+        const valorMax = Masks.unformatMoney(filtrosAvancados.valorMax);
+        corridasFiltradas = corridasFiltradas.filter(c => c.valor <= valorMax);
+      }
+
+      if (filtrosAvancados.viabilidade) {
+        corridasFiltradas = corridasFiltradas.filter(c => 
+          c.analise?.viabilidade === filtrosAvancados.viabilidade
+        );
+      }
+
+      // Busca global
+      const buscaTermo = busca.toLowerCase() || filtrosAvancados.busca.toLowerCase();
+      if (buscaTermo) {
+        corridasFiltradas = corridasFiltradas.filter(c => {
+          const origem = (c.origem || '').toLowerCase();
+          const destino = (c.destino || '').toLowerCase();
+          const plataforma = (c.plataforma || '').toLowerCase();
+          const valor = Formatters.currency(c.valor || 0).toLowerCase();
+          return origem.includes(buscaTermo) || 
+                 destino.includes(buscaTermo) || 
+                 plataforma.includes(buscaTermo) ||
+                 valor.includes(buscaTermo);
+        });
+      }
+
+      // Ordenar por data (mais recente primeiro)
+      corridasFiltradas.sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setCorridas(corridasFiltradas);
+    } catch (error) {
+      console.error('Erro ao carregar histórico:', error);
     }
   };
 
@@ -75,11 +175,65 @@ export default function DashboardScreen({ navigation }) {
     });
 
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, filtro, filtrosAvancados, busca]);
 
   const onRefresh = () => {
     setRefreshing(true);
     loadData();
+  };
+  
+  const deletarCorrida = (id) => {
+    Alert.alert(
+      'Confirmar Exclusão',
+      'Tem certeza que deseja excluir esta corrida?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: async () => {
+            await StorageService.deleteCorrida(id);
+            loadData();
+          },
+        },
+      ]
+    );
+  };
+
+  const abrirDetalhes = (corrida) => {
+    setCorridaSelecionada(corrida);
+    setModalVisible(true);
+  };
+
+  const getViabilidadeColor = (viabilidade) => {
+    switch (viabilidade) {
+      case 'excelente': return '#6BBD9B';
+      case 'boa': return '#22C55E';
+      case 'razoavel': return '#EAB308';
+      case 'ruim': return '#F97316';
+      case 'pessima': return '#EF4444';
+      default: return '#6B7280';
+    }
+  };
+
+  const getViabilidadeIcon = (viabilidade) => {
+    switch (viabilidade) {
+      case 'excelente': return 'checkmark-circle';
+      case 'boa': return 'checkmark-circle-outline';
+      case 'razoavel': return 'alert-circle-outline';
+      case 'ruim': return 'close-circle-outline';
+      case 'pessima': return 'close-circle';
+      default: return 'help-circle-outline';
+    }
+  };
+
+  const getPlataformaColor = (plataforma) => {
+    switch (plataforma?.toLowerCase()) {
+      case 'uber': return '#000000';
+      case '99': return '#FFC107';
+      case 'ifood': return '#EA1D2C';
+      default: return '#6BBD9B';
+    }
   };
 
   const getLucroColor = () => {
@@ -413,6 +567,208 @@ export default function DashboardScreen({ navigation }) {
         </View>
       </Card>
 
+      {/* Seção de Histórico de Corridas */}
+      <View style={styles.historicoSection}>
+        <Card>
+          <TouchableOpacity
+            style={styles.historicoHeader}
+            onPress={() => setMostrarHistorico(!mostrarHistorico)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.historicoHeaderLeft}>
+              <Ionicons name="time-outline" size={24} color="#6BBD9B" />
+              <View style={styles.historicoHeaderText}>
+                <Text style={styles.historicoTitle}>Histórico de Corridas</Text>
+                <Text style={styles.historicoSubtitle}>
+                  {corridas.length} {corridas.length === 1 ? 'corrida' : 'corridas'}
+                </Text>
+              </View>
+            </View>
+            <Ionicons
+              name={mostrarHistorico ? "chevron-up" : "chevron-down"}
+              size={24}
+              color="#6B7280"
+            />
+          </TouchableOpacity>
+
+          {mostrarHistorico && (
+            <>
+              {/* Busca e Filtros */}
+              <View style={styles.historicoControls}>
+                <View style={styles.buscaContainer}>
+                  <View style={styles.buscaInputContainer}>
+                    <Ionicons name="search" size={20} color="#6B7280" style={styles.buscaIcon} />
+                    <TextInput
+                      style={styles.buscaInput}
+                      placeholder="Buscar corridas..."
+                      value={busca}
+                      onChangeText={setBusca}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                    {busca ? (
+                      <TouchableOpacity onPress={() => setBusca('')}>
+                        <Ionicons name="close-circle" size={20} color="#6B7280" />
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                </View>
+
+                <View style={styles.filtrosContainer}>
+                  {[
+                    { key: 'todas', label: 'Todas' },
+                    { key: 'hoje', label: 'Hoje' },
+                    { key: 'semana', label: 'Semana' },
+                    { key: 'mes', label: 'Mês' },
+                  ].map((f) => (
+                    <TouchableOpacity
+                      key={f.key}
+                      style={[
+                        styles.filtroButton,
+                        filtro === f.key && styles.filtroButtonActive,
+                      ]}
+                      onPress={() => setFiltro(f.key)}
+                    >
+                      <Text
+                        style={[
+                          styles.filtroButtonText,
+                          filtro === f.key && styles.filtroButtonTextActive,
+                        ]}
+                      >
+                        {f.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                  <TouchableOpacity
+                    style={styles.filtroButtonIcon}
+                    onPress={() => setFiltrosModalVisible(true)}
+                  >
+                    <Ionicons name="filter" size={18} color="#6BBD9B" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Lista de Corridas */}
+              {corridas.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Ionicons name="car-outline" size={64} color="#9CA3AF" />
+                  <Text style={styles.emptyText}>
+                    Nenhuma corrida encontrada
+                  </Text>
+                  <Text style={styles.emptySubtext}>
+                    Comece capturando suas primeiras corridas!
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.corridasList}>
+                  {corridas.slice(0, 5).map((corrida) => (
+                    <TouchableOpacity
+                      key={corrida.id}
+                      activeOpacity={0.7}
+                      onPress={() => abrirDetalhes(corrida)}
+                      style={styles.corridaItem}
+                    >
+                      <View style={styles.corridaItemHeader}>
+                        <View style={[
+                          styles.plataformaBadge,
+                          { backgroundColor: getPlataformaColor(corrida.plataforma) }
+                        ]}>
+                          <Text style={styles.plataformaText}>
+                            {corrida.plataforma?.toUpperCase() || 'OUTROS'}
+                          </Text>
+                        </View>
+                        <Text style={styles.corridaData}>
+                          {moment(corrida.createdAt).format('DD/MM HH:mm')}
+                        </Text>
+                      </View>
+
+                      <View style={styles.corridaItemBody}>
+                        <View style={styles.corridaValorContainer}>
+                          <Text style={styles.corridaValor}>
+                            {Formatters.currency(corrida.valor || 0)}
+                          </Text>
+                          {corrida.analise && (
+                            <View style={styles.viabilidadeBadge}>
+                              <Ionicons
+                                name={getViabilidadeIcon(corrida.analise.viabilidade)}
+                                size={14}
+                                color={getViabilidadeColor(corrida.analise.viabilidade)}
+                              />
+                              <Text
+                                style={[
+                                  styles.viabilidadeText,
+                                  { color: getViabilidadeColor(corrida.analise.viabilidade) }
+                                ]}
+                              >
+                                {corrida.analise.recomendacao.split('!')[0]}
+                              </Text>
+                            </View>
+                          )}
+                        </View>
+
+                        <View style={styles.corridaInfo}>
+                          <View style={styles.corridaInfoItem}>
+                            <Ionicons name="location" size={14} color="#6B7280" />
+                            <Text style={styles.corridaInfoText}>
+                              {Formatters.distance(corrida.distancia || 0)}
+                            </Text>
+                          </View>
+                          <View style={styles.corridaInfoItem}>
+                            <Ionicons name="time" size={14} color="#6B7280" />
+                            <Text style={styles.corridaInfoText}>
+                              {corrida.tempoEstimado || 0} min
+                            </Text>
+                          </View>
+                        </View>
+
+                        {corrida.origem && (
+                          <View style={styles.corridaEndereco}>
+                            <Ionicons name="navigate" size={12} color="#9CA3AF" />
+                            <Text style={styles.corridaEnderecoText} numberOfLines={1}>
+                              {corrida.origem} → {corrida.destino || 'Destino'}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+
+                      <View style={styles.corridaItemFooter}>
+                        <TouchableOpacity
+                          style={styles.actionButtonSmall}
+                          onPress={() => abrirDetalhes(corrida)}
+                        >
+                          <Ionicons name="eye-outline" size={16} color="#6BBD9B" />
+                          <Text style={styles.actionButtonTextSmall}>Detalhes</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.actionButtonSmall, styles.actionButtonDanger]}
+                          onPress={() => deletarCorrida(corrida.id)}
+                        >
+                          <Ionicons name="trash-outline" size={16} color="#EF4444" />
+                        </TouchableOpacity>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                  
+                  {corridas.length > 5 && (
+                    <TouchableOpacity
+                      style={styles.verMaisButton}
+                      onPress={() => {
+                        // Aqui você pode expandir para mostrar todas ou navegar para uma tela completa
+                        Alert.alert('Info', 'Mostrando as 5 mais recentes. Use os filtros para ver mais.');
+                      }}
+                    >
+                      <Text style={styles.verMaisText}>
+                        Ver mais {corridas.length - 5} corridas
+                      </Text>
+                      <Ionicons name="chevron-down" size={20} color="#6BBD9B" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </>
+          )}
+        </Card>
+      </View>
+
       {/* Botões de Ação */}
       <View style={styles.actionsContainer}>
         <Button
@@ -429,6 +785,140 @@ export default function DashboardScreen({ navigation }) {
           style={styles.actionButton}
         />
       </View>
+
+      {/* Modal de Detalhes */}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Detalhes da Corrida</Text>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color="#111827" />
+              </TouchableOpacity>
+            </View>
+
+            {corridaSelecionada && (
+              <ScrollView style={styles.modalBody}>
+                {corridaSelecionada.imagem && (
+                  <Image
+                    source={{ uri: corridaSelecionada.imagem }}
+                    style={styles.modalImage}
+                    resizeMode="contain"
+                  />
+                )}
+
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalSectionTitle}>Informações Básicas</Text>
+                  <View style={styles.modalRow}>
+                    <Text style={styles.modalLabel}>Plataforma:</Text>
+                    <Text style={styles.modalValue}>
+                      {corridaSelecionada.plataforma?.toUpperCase() || 'N/A'}
+                    </Text>
+                  </View>
+                  <View style={styles.modalRow}>
+                    <Text style={styles.modalLabel}>Valor:</Text>
+                    <Text style={[styles.modalValue, styles.modalValueBold]}>
+                      {Formatters.currency(corridaSelecionada.valor || 0)}
+                    </Text>
+                  </View>
+                  <View style={styles.modalRow}>
+                    <Text style={styles.modalLabel}>Distância:</Text>
+                    <Text style={styles.modalValue}>
+                      {Formatters.distance(corridaSelecionada.distancia || 0)}
+                    </Text>
+                  </View>
+                  <View style={styles.modalRow}>
+                    <Text style={styles.modalLabel}>Tempo:</Text>
+                    <Text style={styles.modalValue}>
+                      {corridaSelecionada.tempoEstimado || 0} minutos
+                    </Text>
+                  </View>
+                  <View style={styles.modalRow}>
+                    <Text style={styles.modalLabel}>Data:</Text>
+                    <Text style={styles.modalValue}>
+                      {moment(corridaSelecionada.createdAt).format('DD/MM/YYYY HH:mm')}
+                    </Text>
+                  </View>
+                </View>
+
+                {corridaSelecionada.origem && (
+                  <View style={styles.modalSection}>
+                    <Text style={styles.modalSectionTitle}>Rota</Text>
+                    <View style={styles.modalRow}>
+                      <Text style={styles.modalLabel}>Origem:</Text>
+                      <Text style={styles.modalValue}>{corridaSelecionada.origem}</Text>
+                    </View>
+                    {corridaSelecionada.destino && (
+                      <View style={styles.modalRow}>
+                        <Text style={styles.modalLabel}>Destino:</Text>
+                        <Text style={styles.modalValue}>{corridaSelecionada.destino}</Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                {corridaSelecionada.analise && (
+                  <View style={styles.modalSection}>
+                    <Text style={styles.modalSectionTitle}>Análise de Viabilidade</Text>
+                    <View style={[
+                      styles.modalAnaliseCard,
+                      { borderLeftColor: getViabilidadeColor(corridaSelecionada.analise.viabilidade) }
+                    ]}>
+                      <View style={styles.modalRow}>
+                        <Text style={styles.modalLabel}>Recomendação:</Text>
+                        <Text style={[
+                          styles.modalValue,
+                          { color: getViabilidadeColor(corridaSelecionada.analise.viabilidade) }
+                        ]}>
+                          {corridaSelecionada.analise.recomendacao}
+                        </Text>
+                      </View>
+                      <View style={styles.modalRow}>
+                        <Text style={styles.modalLabel}>Lucro Líquido:</Text>
+                        <Text style={[
+                          styles.modalValue,
+                          { color: corridaSelecionada.analise.lucroLiquido > 0 ? '#6BBD9B' : '#EF4444' }
+                        ]}>
+                          {Formatters.currency(corridaSelecionada.analise.lucroLiquido)}
+                        </Text>
+                      </View>
+                      <View style={styles.modalRow}>
+                        <Text style={styles.modalLabel}>Margem:</Text>
+                        <Text style={styles.modalValue}>
+                          {Formatters.percentage(corridaSelecionada.analise.margemLucro)}
+                        </Text>
+                      </View>
+                      <View style={styles.modalRow}>
+                        <Text style={styles.modalLabel}>Custo Total:</Text>
+                        <Text style={styles.modalValue}>
+                          {Formatters.currency(corridaSelecionada.analise.custoTotal)}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                )}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      <FiltrosAvancados
+        visible={filtrosModalVisible}
+        onClose={() => setFiltrosModalVisible(false)}
+        onApply={(filtros) => {
+          setFiltrosAvancados(filtros);
+        }}
+        filtros={filtrosAvancados}
+      />
     </ScrollView>
   );
 }
@@ -627,6 +1117,306 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     width: '100%',
+  },
+  historicoSection: {
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  historicoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  historicoHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  historicoHeaderText: {
+    gap: 2,
+  },
+  historicoTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  historicoSubtitle: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  historicoControls: {
+    marginTop: 16,
+    gap: 12,
+  },
+  buscaContainer: {
+    marginBottom: 8,
+  },
+  buscaInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 12,
+  },
+  buscaIcon: {
+    marginRight: 8,
+  },
+  buscaInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#111827',
+  },
+  filtrosContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  filtroButton: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+  },
+  filtroButtonActive: {
+    backgroundColor: '#6BBD9B',
+  },
+  filtroButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  filtroButtonTextActive: {
+    color: '#FFFFFF',
+  },
+  filtroButtonIcon: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  corridasList: {
+    marginTop: 12,
+    gap: 12,
+  },
+  corridaItem: {
+    padding: 16,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  corridaItemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  plataformaBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  plataformaText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  corridaData: {
+    fontSize: 11,
+    color: '#6B7280',
+  },
+  corridaItemBody: {
+    marginBottom: 12,
+  },
+  corridaValorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  corridaValor: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#6BBD9B',
+  },
+  viabilidadeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 4,
+  },
+  viabilidadeText: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  corridaInfo: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 8,
+  },
+  corridaInfoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  corridaInfoText: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  corridaEndereco: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
+  corridaEnderecoText: {
+    fontSize: 11,
+    color: '#9CA3AF',
+    flex: 1,
+  },
+  corridaItemFooter: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  actionButtonSmall: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  actionButtonDanger: {
+    flex: 0,
+    paddingHorizontal: 12,
+    borderColor: '#FEE2E2',
+    backgroundColor: '#FEF2F2',
+  },
+  actionButtonTextSmall: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6BBD9B',
+  },
+  verMaisButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    gap: 8,
+    marginTop: 8,
+  },
+  verMaisText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6BBD9B',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 13,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+    paddingBottom: 40,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  modalCloseButton: {
+    padding: 8,
+  },
+  modalBody: {
+    padding: 20,
+  },
+  modalImage: {
+    width: '100%',
+    height: 300,
+    borderRadius: 12,
+    marginBottom: 20,
+    backgroundColor: '#F3F4F6',
+  },
+  modalSection: {
+    marginBottom: 24,
+  },
+  modalSectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: 12,
+  },
+  modalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  modalLabel: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  modalValue: {
+    fontSize: 14,
+    color: '#111827',
+    fontWeight: '500',
+  },
+  modalValueBold: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  modalAnaliseCard: {
+    backgroundColor: '#F9FAFB',
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    marginTop: 8,
   },
 });
 
