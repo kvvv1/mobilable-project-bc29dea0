@@ -16,22 +16,15 @@ let supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl ||
 let supabaseAnonKey = Constants.expoConfig?.extra?.supabaseAnonKey || 
                       process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-// Valores padrão (substitua pela sua chave anon real)
+// Valores padrão (já configurados)
 if (!supabaseUrl) {
   supabaseUrl = 'https://wlfmhygheizuuyohcbyj.supabase.co';
-  console.warn('⚠️ Usando URL padrão do Supabase. Configure EXPO_PUBLIC_SUPABASE_URL para produção.');
+  logger.debug('Usando URL padrão do Supabase do app.config.js');
 }
 
 if (!supabaseAnonKey) {
-  console.error('❌ ERRO: Supabase Anon Key não encontrada!');
-  console.error('📝 Para corrigir:');
-  console.error('   1. Acesse: https://supabase.com/dashboard/project/wlfmhygheizuuyohcbyj/settings/api');
-  console.error('   2. Copie a "anon public" key');
-  console.error('   3. Crie um arquivo .env na pasta mobile-app com:');
-  console.error('      EXPO_PUBLIC_SUPABASE_URL=https://wlfmhygheizuuyohcbyj.supabase.co');
-  console.error('      EXPO_PUBLIC_SUPABASE_ANON_KEY=sua_chave_aqui');
-  console.error('   4. Reinicie o servidor: npm start --clear');
-  throw new Error('Supabase Anon Key é obrigatória. Configure EXPO_PUBLIC_SUPABASE_ANON_KEY no arquivo .env');
+  supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsZm1oeWdoZWl6dXV5b2hjYnlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3NDM3NjMsImV4cCI6MjA3OTMxOTc2M30.ojY2FqJq24HzPqf2DwiFDZUCCzA7LlUIDUCRtORZm00';
+  logger.debug('Usando Anon Key padrão do app.config.js');
 }
 
 if (!supabaseUrl) {

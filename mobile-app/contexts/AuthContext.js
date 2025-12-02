@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { AuthService } from '../services/authService';
 import { supabase } from '../services/authService';
+import { StorageService } from '../services/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../utils/logger';
 
@@ -253,6 +254,17 @@ export function AuthProvider({ children }) {
         logger.debug('Login bem-sucedido, carregando usuário...');
         // Carregar usuário primeiro (já verifica onboarding automaticamente)
         await loadUser();
+        
+        // Sincronizar dados locais com Supabase após login
+        try {
+          logger.debug('Iniciando sincronização de dados locais...');
+          const syncResult = await StorageService.syncLocalDataToSupabase();
+          if (syncResult.synced > 0) {
+            logger.debug(`Sincronização concluída: ${syncResult.synced} itens sincronizados`);
+          }
+        } catch (error) {
+          logger.warn('Erro ao sincronizar dados após login:', error);
+        }
         
         logger.debug('Login concluído');
         return { success: true, error: null };

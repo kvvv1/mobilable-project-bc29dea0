@@ -40,6 +40,7 @@ export default {
     extra: {
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://wlfmhygheizuuyohcbyj.supabase.co',
       supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsZm1oeWdoZWl6dXV5b2hjYnlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3NDM3NjMsImV4cCI6MjA3OTMxOTc2M30.ojY2FqJq24HzPqf2DwiFDZUCCzA7LlUIDUCRtORZm00',
+      apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000',
     }
   }
 };

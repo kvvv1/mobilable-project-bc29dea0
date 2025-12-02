@@ -58,6 +58,42 @@ export default function SelecionarVeiculoScreen({ navigation }) {
 
   const loadVeiculoAtual = async () => {
     try {
+      // Primeiro tentar buscar do Supabase
+      if (user?.id) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('current_organization_id')
+          .eq('id', user.id)
+          .single();
+
+        if (profile?.current_organization_id) {
+          // Buscar veículo ativo do Supabase
+          const { data: vehicles, error: vehiclesError } = await supabase
+            .from('vehicles')
+            .select('*')
+            .eq('organization_id', profile.current_organization_id)
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (!vehiclesError && vehicles) {
+            setVeiculoAtual({
+              id: vehicles.id,
+              tipo: vehicles.tipo,
+              marca: vehicles.marca,
+              modelo: vehicles.modelo,
+              ano: vehicles.ano || '',
+              consumo: vehicles.consumo_medio?.toString() || '',
+              personalizado: vehicles.personalizado || false,
+            });
+            return;
+          }
+        }
+      }
+
+      // Fallback: buscar do config local
       const configData = await StorageService.getConfig();
       if (configData?.veiculo) {
         setVeiculoAtual(configData.veiculo);
